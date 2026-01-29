@@ -196,7 +196,7 @@ export default function Welcome({ auth }) {
                             </div>
                         </div>
 
-                        <div className="hero-stat-card absolute bottom-12 left-4 lg:bottom-[18%] lg:left-[10%] bg-white/80 backdrop-blur-md p-5 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white animate-float-delayed z-20">
+                        <div className="hero-stat-card absolute bottom-12 left-4 lg:bottom-[5%] lg:left-[10%] bg-white/80 backdrop-blur-md p-5 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white animate-float-delayed z-20">
                             <div className="flex items-center gap-3">
                                 <div className="p-2.5 bg-blue-50 rounded-full text-blue-500">🛡️</div>
                                 <div>

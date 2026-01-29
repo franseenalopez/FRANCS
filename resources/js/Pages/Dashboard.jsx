@@ -1,208 +1,167 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link } from '@inertiajs/react'; // FIX: Removed unused 'useRef' import if I use inline component, but actually I need to move it outside or use a proper component.
-// Wait, I will use a separate component definition inside the file to keep it clean.
-import { useRef, useEffect, useState } from 'react';
-
-// Separated TiltCard component for better performance isolation
-const TiltCard = ({ children, className }) => {
-    const cardRef = useRef(null);
-    const frameId = useRef(null);
-
-    const handleMouseMove = (e) => {
-        // Optimization: Throttle events using requestAnimationFrame
-        if (frameId.current) return;
-
-        const card = cardRef.current;
-        if (!card) return;
-
-        frameId.current = requestAnimationFrame(() => {
-            const rect = card.getBoundingClientRect();
-            // Calculate relative position
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            // Limit rotation to small angles for subtle effect (e.g., +/- 4 deg)
-            const rotateX = ((y - centerY) / centerY) * -4;
-            const rotateY = ((x - centerX) / centerX) * 4;
-
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-            frameId.current = null;
-        });
-    };
-
-    const handleMouseLeave = () => {
-        if (frameId.current) {
-            cancelAnimationFrame(frameId.current);
-            frameId.current = null;
-        }
-        if (cardRef.current) {
-            cardRef.current.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale3d(1, 1, 1)';
-        }
-    };
-
-    return (
-        <div
-            ref={cardRef}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
-            className={className}
-            style={{ transformStyle: 'preserve-3d', willChange: 'transform' }} // Optimization: hint to browser
-        >
-            {children}
-        </div>
-    );
-};
+import { Head, Link } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
 
 export default function Dashboard({ auth, recentOrders, stats }) {
     const user = auth.user;
+    const [greeting, setGreeting] = useState('Welcome back');
     const [currentTime, setCurrentTime] = useState(new Date());
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            setCurrentTime(new Date());
-        }, 1000);
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+        const hour = new Date().getHours();
+        if (hour < 12) setGreeting('Good morning');
+        else if (hour < 18) setGreeting('Good afternoon');
+        else setGreeting('Good evening');
         return () => clearInterval(timer);
     }, []);
 
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-bold leading-tight text-gray-800 uppercase tracking-widest">
-                    My Account
-                </h2>
-            }
-        >
+        <AuthenticatedLayout>
             <Head title="Dashboard" />
 
-            {/* Background Decorations (Optimized: Static Opacity instead of Animation) */}
-            <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-                <div className="absolute top-[-20%] right-[-10%] w-[800px] h-[800px] bg-[#3BE798]/10 rounded-full blur-[120px] mix-blend-multiply opacity-50"></div>
-                <div className="absolute bottom-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-100/40 rounded-full blur-[100px] mix-blend-multiply opacity-70"></div>
-            </div>
-
-            <div className="relative z-10 py-12">
+            <div className="py-8 bg-[#F5F5F7] min-h-screen font-sans">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-10">
 
                     {/* Hero Section */}
-                    {/* Optimization: Reduced blur radius slightly if needed, but keeping xl for aesthetics if GPU handles it. removed heavy shadow transition on scroll */}
-                    <div className="bg-white/60 backdrop-blur-xl border border-white/60 p-8 md:p-12 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex flex-col md:flex-row items-center justify-between gap-8 transition-shadow hover:shadow-[0_20px_40px_rgb(0,0,0,0.06)]">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 border-b border-gray-200/60 transition-all hover:border-gray-300">
                         <div>
-                            <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight mb-4">
-                                Welcome, <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#3BE798] to-gray-900">{user.name.split(' ')[0]}</span>.
+                            <div className="flex items-center gap-3 mb-2">
+                                <p className="text-sm font-semibold text-gray-400 uppercase tracking-widest">My Account</p>
+                                <span className="h-1 w-1 rounded-full bg-gray-300"></span>
+                                <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-white border border-gray-200 shadow-sm transition-all hover:scale-105">
+                                    <span className="relative flex h-2 w-2">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                                    </span>
+                                    <span className="text-xs font-mono font-medium text-gray-600">
+                                        {currentTime.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+                                    </span>
+                                </div>
+                            </div>
+                            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 tracking-tight">
+                                {greeting}, {user.name.split(' ')[0]}.
                             </h1>
-                            <p className="text-lg text-gray-500 font-medium max-w-xl leading-relaxed">
-                                You've got some heat in your rotation. Check your latest pickups and stats below.
-                            </p>
-                            <div className="mt-6 inline-flex items-center gap-3 px-5 py-2.5 bg-gray-900 rounded-full shadow-xl">
-                                <span className="relative flex h-2 w-2">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#3BE798] opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3BE798]"></span>
-                                </span>
-                                <span className="font-mono text-base font-bold text-white tracking-widest">
-                                    {currentTime.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                                </span>
-                                <span className="h-4 w-px bg-gray-700"></span>
-                                <span className="text-xs font-bold text-gray-400 tracking-wider">SYSTEM</span>
-                            </div>
                         </div>
-                        <div className="flex flex-wrap gap-4">
-                            <Link href={route('shop.index')} className="px-8 py-3 bg-gray-900 text-white rounded-full font-bold hover:bg-gray-800 transition-all shadow-lg hover:shadow-gray-900/20 hover:-translate-y-1">
-                                Shop New Drops
-                            </Link>
-                            <Link href={route('profile.edit')} className="px-8 py-3 bg-white text-gray-900 border border-gray-200 rounded-full font-bold hover:bg-gray-50 transition-all shadow-sm hover:shadow-md hover:-translate-y-1">
-                                Settings
+                        <div className="flex items-center gap-4">
+                            <Link
+                                href={route('shop.index')}
+                                className="group inline-flex items-center justify-center px-8 py-4 bg-gray-900 text-white text-sm font-bold rounded-full shadow-[0_4px_14px_0_rgba(0,0,0,0.39)] hover:shadow-[0_6px_20px_rgba(93,93,93,0.23)] hover:bg-black transition-all transform hover:-translate-y-0.5"
+                            >
+                                <span>Shop New Drops</span>
+                                <svg className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                             </Link>
                         </div>
                     </div>
 
-                    {/* Stats Grid with Optimized Tilt Interaction */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        {/* Stats Card 1 */}
-                        <TiltCard className="bg-white/70 backdrop-blur-lg border border-white/60 p-8 rounded-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.03)] cursor-default transition-transform duration-100 ease-out">
-                            <div className="flex items-center justify-between mb-6">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Orders</h4>
-                                <div className="p-3 bg-gray-50 rounded-xl text-gray-900">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
+                        {/* Stat Card 1 */}
+                        <div className="relative overflow-hidden rounded-[1.5rem] bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <dt className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Total Orders</dt>
+                                    <dd className="mt-4 text-4xl font-bold tracking-tight text-gray-900">{stats.total_orders}</dd>
+                                </div>
+                                <div className="p-3 bg-gray-50 rounded-2xl">
+                                    <svg className="h-6 w-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                    </svg>
                                 </div>
                             </div>
-                            <div className="text-4xl font-black text-gray-900">{stats.total_orders}</div>
-                            <p className="text-sm text-gray-400 font-bold mt-2">Successful drops</p>
-                        </TiltCard>
+                            <div className="mt-4">
+                                <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600">
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path></svg>
+                                    Successful deliveries
+                                </span>
+                            </div>
+                        </div>
 
-                        {/* Stats Card 2 */}
-                        <TiltCard className="bg-white/70 backdrop-blur-lg border border-white/60 p-8 rounded-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.03)] cursor-default transition-transform duration-100 ease-out">
-                            <div className="flex items-center justify-between mb-6">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Spent</h4>
-                                <div className="p-3 bg-gray-50 rounded-xl text-gray-900">
-                                    {/* Wallet Icon (Generic Money) */}
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4" /><path d="M3 5v14a2 2 0 0 0 2 2h16v-5" /><path d="M18 12a2 2 0 0 0 0 4h4v-4Z" /></svg>
+                        {/* Stat Card 2 */}
+                        <div className="relative overflow-hidden rounded-[1.5rem] bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <dt className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Total Spent</dt>
+                                    <dd className="mt-4 text-4xl font-bold tracking-tight text-gray-900">₹{stats.total_spent}</dd>
+                                </div>
+                                <div className="p-3 bg-gray-50 rounded-2xl">
+                                    <svg className="h-6 w-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
                                 </div>
                             </div>
-                            {/* Uses Indian Rupee Symbol */}
-                            <div className="text-4xl font-black text-gray-900">₹{stats.total_spent}</div>
-                            <p className="text-sm text-gray-400 font-bold mt-2">Invested in fresh kicks</p>
-                        </TiltCard>
+                            <div className="mt-4">
+                                <span className="inline-flex items-center gap-1 text-sm font-medium text-gray-500">
+                                    Lifetime value
+                                </span>
+                            </div>
+                        </div>
 
-                        {/* Stats Card 3 */}
-                        <TiltCard className="bg-white/70 backdrop-blur-lg border border-white/60 p-8 rounded-[2rem] shadow-[0_10px_30px_rgba(0,0,0,0.03)] cursor-default transition-transform duration-100 ease-out">
-                            <div className="flex items-center justify-between mb-6">
-                                <h4 className="text-xs font-bold text-gray-400 uppercase tracking-widest">Items Copped</h4>
-                                <div className="p-3 bg-gray-50 rounded-xl text-gray-900">
-                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.9 19.8l.2-1.1L22 17.3c.6-2.5-.9-5.1-3.5-5.7l-4.2-1c.6-1.5.3-3.2-.8-4.4L8.8 1.4C7.7.3 6 .1 4.7.7l-3.3 1.5c-1.3.6-1.9 2-1.3 3.3l4.7 9.8c.8 1.7 2.8 2.4 4.5 1.6l1.2-.6 2.3 5c.6 1.3 2 2 3.3 1.4l4.7-2.1c.1 0 .1-.1.1-.2zM5.5 11.1L2.2 4.3 5.5 2.7l3.3 6.9-3.3 1.5zm8.3 7.6l-2.3-5 3.3-1.6 2.3 5-3.3 1.6z"></path></svg>
+                        {/* Stat Card 3: Items in Cart */}
+                        <div className="relative overflow-hidden rounded-[1.5rem] bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <dt className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Items in Cart</dt>
+                                    <dd className="mt-4 text-4xl font-bold tracking-tight text-gray-900">{stats.cart_count ?? 0}</dd>
+                                </div>
+                                <div className="p-3 bg-gray-50 rounded-2xl">
+                                    <svg className="h-6 w-6 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
                                 </div>
                             </div>
-                            <div className="text-4xl font-black text-gray-900">{stats.total_items}</div>
-                            <p className="text-sm text-gray-400 font-bold mt-2">Grid pairs secured</p>
-                        </TiltCard>
+                            <div className="mt-4">
+                                <span className="inline-flex items-center gap-1 text-sm font-medium text-gray-500">
+                                    Ready to checkout
+                                </span>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Recent Orders Table (Glass Style) */}
-                    <div className="bg-white/60 backdrop-blur-xl border border-white/60 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
-                        <div className="p-8 border-b border-gray-100 flex items-center justify-between">
-                            <h3 className="text-xl font-bold text-gray-900 tracking-tight">Recent Activity</h3>
-                            <Link href="#" className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-gray-900 transition-colors">
+                    {/* Recent Activity Table */}
+                    <div className="rounded-[1.5rem] bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden border border-gray-100 transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)]">
+                        <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
+                            <h3 className="text-lg font-bold text-gray-900">Recent Activity</h3>
+                            <Link href="#" className="text-sm font-semibold text-gray-900 hover:text-gray-600 transition-colors flex items-center gap-1">
                                 View Full History
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path></svg>
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7"></path></svg>
                             </Link>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left">
-                                <thead>
-                                    <tr className="text-gray-400 text-xs font-bold uppercase tracking-wider border-b border-gray-100/50">
-                                        <th className="px-8 py-5">Order ID</th>
-                                        <th className="px-8 py-5">Date</th>
-                                        <th className="px-8 py-5">Status</th>
-                                        <th className="px-8 py-5 text-right">Total</th>
-                                        <th className="px-8 py-5 text-right">Details</th>
+                                <thead className="bg-[#F9FAFB]">
+                                    <tr>
+                                        <th className="px-8 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Order ID</th>
+                                        <th className="px-8 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th className="px-8 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th className="px-8 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Total</th>
+                                        <th className="px-8 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Details</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-gray-100/50">
+                                <tbody className="divide-y divide-gray-100">
                                     {recentOrders && recentOrders.length > 0 ? (
                                         recentOrders.map((order) => (
-                                            <tr key={order.id} className="group hover:bg-white/50 transition-colors">
-                                                <td className="px-8 py-5 font-bold text-gray-900">
+                                            <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
+                                                <td className="px-8 py-5 font-semibold text-gray-900">
                                                     {order.reference}
                                                 </td>
                                                 <td className="px-8 py-5 text-sm font-medium text-gray-500">
                                                     {order.date}
                                                 </td>
                                                 <td className="px-8 py-5">
-                                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ring-1 ring-inset ${order.status === 'Completed' ? 'bg-[#3BE798]/10 text-emerald-800 ring-[#3BE798]/30' :
-                                                        order.status === 'Processing' ? 'bg-blue-50 text-blue-700 ring-blue-600/20' :
-                                                            'bg-yellow-50 text-yellow-800 ring-yellow-600/20'
+                                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${order.status === 'Completed' ? 'bg-[#3BE798]/10 text-[#25a56d]' :
+                                                        order.status === 'Processing' ? 'bg-blue-50 text-blue-700' :
+                                                            'bg-yellow-50 text-yellow-800'
                                                         }`}>
                                                         {order.status}
                                                     </span>
                                                 </td>
-                                                {/* Uses Indian Rupee Symbol */}
-                                                <td className="px-8 py-5 text-right font-black text-gray-900">
+                                                <td className="px-8 py-5 text-right font-bold text-gray-900">
                                                     ₹{order.total}
                                                 </td>
                                                 <td className="px-8 py-5 text-right">
-                                                    <a href={order.view_url} className="text-gray-400 group-hover:text-gray-900 font-bold transition-colors">
+                                                    <a href={order.view_url} className="text-gray-400 hover:text-gray-900 font-semibold transition-colors">
                                                         View
                                                     </a>
                                                 </td>
@@ -210,8 +169,8 @@ export default function Dashboard({ auth, recentOrders, stats }) {
                                         ))
                                     ) : (
                                         <tr>
-                                            <td colSpan="5" className="px-8 py-16 text-center text-gray-500 font-medium">
-                                                No orders found. <Link href={route('shop.index')} className="text-gray-900 underline decoration-2 hover:decoration-gray-500 transition-all">Start your collection</Link> today.
+                                            <td colSpan="5" className="px-8 py-16 text-center text-gray-500">
+                                                No orders found.
                                             </td>
                                         </tr>
                                     )}

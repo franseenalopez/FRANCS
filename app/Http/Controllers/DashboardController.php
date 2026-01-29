@@ -36,6 +36,7 @@ class DashboardController extends Controller
             'total_orders' => Order::where('user_id', $user->id)->count(),
             'total_spent' => number_format(Order::where('user_id', $user->id)->sum('total_price'), 2),
             'total_items' => Order::where('user_id', $user->id)->withCount('items')->get()->sum('items_count'),
+            'cart_count' => 0, // Placeholder: No backend cart table yet
             'member_since' => $user->created_at->format('M Y'),
         ];
 

@@ -79,7 +79,7 @@ export default function ShopIndex({ auth, products, categories, filters = {} }) 
             <Head title="Shop - Francs" />
             <div className="shop-wrapper pt-32">
                 {/* Universal Navbar */}
-                <Navbar auth={auth} cartCount={2} />
+                <Navbar auth={auth} />
 
                 <header className="store-header">
                     <h1 className="page-title">Fresh<br />Drops</h1>

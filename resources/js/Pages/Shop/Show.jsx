@@ -34,7 +34,7 @@ export default function ShopShow({ auth, product, relatedProducts }) {
             </Head>
             <div className="shop-wrapper pt-32">
                 {/* Universal Navbar */}
-                <Navbar auth={auth} cartCount={2} />
+                <Navbar auth={auth} />
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     {/* Breadcrumb */}
