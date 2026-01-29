@@ -19,11 +19,10 @@ Route::get('/about', function () {
 })->name('about');
 
 Route::get('/shop', [App\Http\Controllers\ShopController::class, 'index'])->name('shop.index');
+Route::get('/store-test', [App\Http\Controllers\ShopController::class, 'index']);
 Route::get('/shop/{product}', [App\Http\Controllers\ShopController::class, 'show'])->name('shop.show');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -36,6 +35,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
     Route::resource('products', \App\Http\Controllers\Admin\ProductController::class);
+    Route::resource('orders', \App\Http\Controllers\Admin\OrderController::class)->only(['index']);
+    Route::resource('customers', \App\Http\Controllers\Admin\CustomerController::class)->only(['index']);
+    Route::resource('vendors', \App\Http\Controllers\Admin\VendorController::class)->only(['index']);
 });
 
 require __DIR__.'/auth.php';

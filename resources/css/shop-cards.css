@@ -1,5 +1,6 @@
 /* Fresh Drops Design adapted for Francs */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css');
 
 :root {
     --green: #3BE798;
@@ -21,9 +22,7 @@
     overflow-x: hidden;
 }
 
-.shop-wrapper * {
-    font-family: var(--font-main);
-}
+/* Removed .shop-wrapper * rule to prevent font conflict with icons */
 
 /* --- NAVIGATION OVERRIDES FOR SHOP PAGE (If we want to match the design exactly) --- */
 .shop-nav {
@@ -306,9 +305,10 @@ div[class^="card"] .img::after {
 .addCard {
     position: absolute;
     width: 100%;
-    bottom: 0;
+    top: 320px;
     right: 0;
     pointer-events: none;
+    z-index: 5;
 }
 
 .addCard i {
@@ -334,30 +334,9 @@ div[class^="card"] .img::after {
 }
 
 /* Curve Smoothing */
-.addCard::after,
-.addCard::before {
-    position: absolute;
-    bottom: 0;
-    background-color: transparent;
-    width: 47px;
-    height: 38px;
-    content: '';
-    right: -24px;
-    border-bottom-left-radius: 55%;
-    opacity: 0;
-    transform: translate(0, 20px);
-    box-shadow: 0 20px 0 0 var(--dark-grey);
-    transition: 0.4s;
-    z-index: 15;
-}
-
-.addCard::after {
-    right: unset;
-    left: unset;
-    right: 44px;
-    border-bottom-left-radius: 0;
-    border-bottom-right-radius: 55%;
-}
+/* Curve Smoothing Removed to fix protrusion */
+/* .addCard::after,
+.addCard::before { ... } removed */
 
 /* Hover States */
 div[class^="card"]:hover .img img {
@@ -369,9 +348,7 @@ div[class^="card"]:hover .img::after {
     opacity: 0.4;
 }
 
-div[class^="card"]:hover .addCard i,
-div[class^="card"]:hover .addCard::before,
-div[class^="card"]:hover .addCard::after {
+div[class^="card"]:hover .addCard i {
     opacity: 1;
     transform: translate(0, 0);
 }
@@ -382,13 +359,9 @@ div[class^='card'][class*='seller'] {
     background-color: var(--dark-grey);
 }
 
+/* Seller variant addCard styles adjusted */
 div[class^='card'][class*='seller'] .addCard i {
     border-color: var(--dark-grey);
-}
-
-div[class^='card'][class*='seller'] .addCard::after,
-div[class^='card'][class*='seller'] .addCard::before {
-    box-shadow: 0 20px 0 0 var(--dark-grey);
 }
 
 div[class^='card'][class*='out'] {

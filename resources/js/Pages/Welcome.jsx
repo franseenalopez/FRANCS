@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState, useRef, useEffect } from 'react';
+import Navbar from '@/Components/Navbar';
 import PixelTransition from '@/Components/PixelTransition';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -109,61 +110,40 @@ export default function Welcome({ auth }) {
             <div className="font-sans text-[#1a1a1a] bg-white min-h-screen overflow-x-hidden">
 
                 {/* Navbar */}
-                <nav className="flex justify-between items-center px-[5%] py-6 sticky top-0 bg-white/90 backdrop-blur-md z-50 border-b border-[#e5e5e5]">
-                    <div className="text-xl font-extrabold tracking-tighter">FRANCS</div>
-                    <ul className="hidden md:flex gap-10 font-medium text-sm uppercase tracking-wider">
-                        <li><Link href="/" className="hover:text-accent transition-colors duration-300">Home</Link></li>
-                        <li><Link href={route('shop.index')} className="hover:text-accent transition-colors duration-300">Store</Link></li>
-                        <li><Link href={route('about')} className="hover:text-accent transition-colors duration-300">About</Link></li>
-                        <li><Link href="#" className="hover:text-accent transition-colors duration-300">Contact</Link></li>
-                    </ul>
-                    <div className="flex items-center gap-6">
-                        <button className="text-[#1a1a1a] hover:text-accent transition-colors" aria-label="Search">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                        </button>
-                        <button
-                            className={`relative text-[#1a1a1a] hover:text-accent transition-transform duration-200 ${isCartAnimating ? 'scale-125' : 'scale-100'}`}
-                            aria-label="Cart"
-                        >
-                            <Link href={route('shop.index')}>
-                                <svg width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                            </Link>
-                            <span className="absolute -top-[5px] -right-[8px] bg-accent text-white text-[0.7rem] px-[6px] py-[2px] rounded-full font-bold">
-                                {cartCount}
-                            </span>
-                        </button>
-                    </div>
-                </nav>
+                {/* Floating Glass Navbar */}
+                {/* Navbar */}
+                <Navbar auth={auth} cartCount={cartCount} />
+                {/* Spacer removed to allow background to extend to top */}
 
                 {/* Hero Section */}
-                <header ref={heroRef} className="grid grid-cols-1 lg:grid-cols-2 min-h-[85vh] px-[5%] items-center bg-white lg:bg-[linear-gradient(to_right,#ffffff_50%,#f8f8f8_50%)] pt-16 lg:pt-0 overflow-visible relative isolate bg-dot-pattern">
+                <header ref={heroRef} className="grid grid-cols-1 lg:grid-cols-2 min-h-screen px-[5%] items-center bg-white lg:bg-[linear-gradient(to_right,#ffffff_50%,#f8f8f8_50%)] pt-0 overflow-visible relative isolate bg-dot-pattern">
                     {/* Decorative Background Text */}
-                    <div className="hero-bg-text absolute top-[53%] left-[45%] -translate-x-1/2 -translate-y-1/2 font-black text-[9rem] md:text-[12rem] text-black opacity-50 select-none -z-10 tracking-tighter w-full text-center pointer-events-none whitespace-nowrap">
+                    <div className="hero-bg-text absolute top-[60%] left-[48%] -translate-x-1/2 -translate-y-1/2 font-black text-[4rem] md:text-[7rem] text-black opacity-50 select-none -z-10 tracking-tighter w-full text-center pointer-events-none whitespace-nowrap">
                         FRANCS
                     </div>
 
-                    <div className="z-10 lg:pr-16 text-center lg:text-left mb-12 lg:mb-0 relative">
-                        <span className="hero-title block text-sm font-semibold uppercase tracking-[0.1em] text-[#666666] mb-6">— The 2026 Earth Collection</span>
-                        <h1 className="hero-title text-5xl lg:text-8xl font-black leading-[0.9] text-[#1a1a1a] mb-6 tracking-tight">
+                    <div className="z-10 lg:pr-16 text-center lg:text-left mb-8 lg:mb-0 relative">
+                        <span className="hero-title block text-[0.6rem] font-semibold uppercase tracking-[0.1em] text-[#666666] mb-3">— The 2026 Earth Collection</span>
+                        <h1 className="hero-title text-3xl lg:text-5xl font-black leading-[0.9] text-[#1a1a1a] mb-4 tracking-tight">
                             PERFORMANCE<br />
                             MEETS <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1a1a1a] to-[#555]">PRECISION.</span>
                         </h1>
-                        <p className="hero-subtitle text-[#555] text-lg lg:text-xl mb-8 max-w-lg leading-relaxed font-medium">
+                        <p className="hero-subtitle text-[#555] text-sm lg:text-base mb-6 max-w-sm leading-relaxed font-medium">
                             Born from the ground up. Our new minimalist sneaker combines high-performance recycled materials with timeless Italian craftsmanship.
                         </p>
 
-                        <div className="hero-cta flex flex-col gap-8">
+                        <div className="hero-cta flex flex-col gap-6">
                             <div className="flex items-center gap-6">
                                 <Link
                                     href={route('shop.index')}
-                                    className="group relative px-8 py-4 bg-[#c85d53] text-white font-bold tracking-wider uppercase overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+                                    className="group relative px-6 py-3 bg-[#c85d53] text-white font-bold tracking-wider uppercase overflow-hidden shadow-lg hover:shadow-xl transition-shadow text-sm"
                                 >
                                     <span className="relative z-10 transition-colors group-hover:text-white">Shop Collection</span>
                                     <div className="absolute inset-0 bg-[#1a1a1a] transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300 ease-out"></div>
                                 </Link>
 
                                 {/* Rotating Seal */}
-                                <div className="relative w-24 h-24 hidden md:flex items-center justify-center animate-[spin_10s_linear_infinite]">
+                                <div className="relative w-20 h-20 hidden md:flex items-center justify-center animate-[spin_10s_linear_infinite]">
                                     <svg viewBox="0 0 100 100" className="w-full h-full text-[#1a1a1a]">
                                         <path id="curve" d="M 50 50 m -37 0 a 37 37 0 1 1 74 0 a 37 37 0 1 1 -74 0" fill="transparent" />
                                         <text fontSize="11" fontWeight="bold" letterSpacing="2">
@@ -172,24 +152,24 @@ export default function Welcome({ auth }) {
                                             </textPath>
                                         </text>
                                     </svg>
-                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xl">✨</div>
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-lg">✨</div>
                                 </div>
                             </div>
 
                             {/* Social Proof */}
-                            <div className="flex flex-col gap-3">
+                            <div className="flex flex-col gap-2">
                                 <div className="flex items-center gap-2">
                                     <div className="flex text-[#f26a5f]">
                                         {[1, 2, 3, 4, 5].map(i => (
-                                            <svg key={i} width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                                            <svg key={i} width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
                                         ))}
                                     </div>
-                                    <span className="text-sm font-bold text-[#1a1a1a]">4.9/5 Rating</span>
-                                    <span className="text-sm text-[#666] border-l border-gray-300 pl-2">Based on 12k+ reviews</span>
+                                    <span className="text-xs font-bold text-[#1a1a1a]">4.9/5 Rating</span>
+                                    <span className="text-xs text-[#666] border-l border-gray-300 pl-2">Based on 12k+ reviews</span>
                                 </div>
-                                <div className="flex items-center gap-4 text-xs font-bold text-[#555] uppercase tracking-wider">
-                                    <span className="flex items-center gap-1"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg> Free Shipping</span>
-                                    <span className="flex items-center gap-1"><svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg> 30-Day Returns</span>
+                                <div className="flex items-center gap-4 text-[0.65rem] font-bold text-[#555] uppercase tracking-wider">
+                                    <span className="flex items-center gap-1"><svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg> Free Shipping</span>
+                                    <span className="flex items-center gap-1"><svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5" /></svg> 30-Day Returns</span>
                                 </div>
                             </div>
                         </div>
@@ -201,27 +181,27 @@ export default function Welcome({ auth }) {
                         </div>
                     </div>
 
-                    <div className="h-full flex items-center justify-center relative min-h-[500px] lg:min-h-[auto] z-10">
+                    <div className="h-full flex items-center justify-center relative min-h-[400px] lg:min-h-[auto] z-10">
                         {/* Blob Background */}
-                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] bg-accent/20 rounded-full blur-[100px] opacity-30 -z-10"></div>
+                        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-accent/20 rounded-full blur-[80px] opacity-30 -z-10"></div>
 
                         {/* Floating Spec Cards */}
-                        <div className="hero-stat-card absolute top-0 right-4 lg:top-[12%] lg:right-[5%] bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white animate-float z-20">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-[#e8fce8] rounded-full text-[#00b862]">🍃</div>
+                        <div className="hero-stat-card absolute top-4 right-4 lg:top-[12%] lg:right-[10%] bg-white/80 backdrop-blur-md p-5 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white animate-float z-20">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2.5 bg-[#e8fce8] rounded-full text-[#00b862]">🍃</div>
                                 <div>
-                                    <div className="text-xs font-bold text-[#888] uppercase tracking-wider">Weight</div>
-                                    <div className="text-base font-bold text-[#1a1a1a]">242g Light</div>
+                                    <div className="text-[0.65rem] font-bold text-[#888] uppercase tracking-wider">Weight</div>
+                                    <div className="text-sm font-bold text-[#1a1a1a]">242g Light</div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="hero-stat-card absolute bottom-10 left-4 lg:bottom-[18%] lg:left-[5%] bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white animate-float-delayed z-20">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-blue-50 rounded-full text-blue-500">🛡️</div>
+                        <div className="hero-stat-card absolute bottom-12 left-4 lg:bottom-[18%] lg:left-[10%] bg-white/80 backdrop-blur-md p-5 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white animate-float-delayed z-20">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2.5 bg-blue-50 rounded-full text-blue-500">🛡️</div>
                                 <div>
-                                    <div className="text-xs font-bold text-[#888] uppercase tracking-wider">Durability</div>
-                                    <div className="text-base font-bold text-[#1a1a1a]">Grade-A</div>
+                                    <div className="text-[0.65rem] font-bold text-[#888] uppercase tracking-wider">Durability</div>
+                                    <div className="text-sm font-bold text-[#1a1a1a]">Grade-A</div>
                                 </div>
                             </div>
                         </div>
@@ -229,7 +209,7 @@ export default function Welcome({ auth }) {
                         <img
                             src="/images/shoe3.png"
                             alt="Francs 2026 Earth Edition"
-                            className="hero-shoe relative w-[85%] max-w-[500px] lg:max-w-[800px] lg:w-[95%] -rotate-[25deg] drop-shadow-[0_35px_35px_rgba(0,0,0,0.25)] z-10 transition-transform duration-700 hover:scale-105 hover:-rotate-[22deg]"
+                            className="hero-shoe relative w-[65%] max-w-[300px] lg:max-w-[450px] lg:w-[80%] -rotate-[25deg] drop-shadow-[0_35px_35px_rgba(0,0,0,0.25)] z-10 transition-transform duration-700 hover:scale-105 hover:-rotate-[22deg]"
                         />
                     </div>
                 </header>
@@ -307,7 +287,7 @@ export default function Welcome({ auth }) {
                 </section>
 
                 {/* Featured Collections (Scrollable Cards) */}
-                <section ref={featuredRef} className="px-[5%] py-24 bg-[#f8f8f8]">
+                <section ref={featuredRef} className="px-[5%] pt-12 pb-0 bg-[#f8f8f8]">
                     <div className="flex justify-between items-end mb-16">
                         <h2 className="text-4xl font-extrabold tracking-tight text-[#2B2B2B] leading-none">FEATURED<br />COLLECTIONS</h2>
                         <Link href={route('shop.index')} className="font-bold border-b-2 border-black pb-0.5 hover:text-[#3BE798] hover:border-[#3BE798] transition-all">
@@ -370,8 +350,8 @@ export default function Welcome({ auth }) {
                 </section>
 
                 {/* Our Innovation Section */}
-                <section ref={innovationRef} className="px-[5%] py-24 bg-[#f8f8f8]">
-                    <div className="text-center mb-16">
+                <section ref={innovationRef} className="px-[5%] pt-12 pb-32 bg-[#f8f8f8] relative z-20">
+                    <div className="text-center mb-8">
                         <span className="text-sm font-bold text-accent tracking-widest uppercase">Why Francs?</span>
                         <h2 className="text-4xl font-extrabold text-[#1a1a1a] mt-2">OUR INNOVATION</h2>
                     </div>
@@ -381,7 +361,7 @@ export default function Welcome({ auth }) {
                         <div className="innovation-card bg-white p-12 rounded-[40px] border border-black/5 hover:-translate-y-2 transition-transform duration-300 shadow-sm hover:shadow-xl group min-h-[550px] flex flex-col justify-between">
                             <div>
                                 <div className="w-24 h-24 bg-[#e8fce8] rounded-3xl flex items-center justify-center text-[#00b862] mb-8 group-hover:scale-110 transition-transform duration-500">
-                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 22h14a2 2 0 0 0 2-2V7.5L14.5 2H6a2 2 0 0 0-2 2v4" /><path d="M14 2v6h6" /><path d="M10 20v-5.5" /><path d="M10 18.5a3.5 3.5 0 0 0 3.5-3.5v-.5" /><path d="M10 18.5a3.5 3.5 0 0 1-3.5-3.5v-.5" /></svg>
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.79 10-10 10Z" /><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" /></svg>
                                 </div>
                                 <h3 className="text-3xl font-extrabold text-[#1a1a1a] mb-6">Sustainable Future</h3>
                                 <div className="space-y-4">
@@ -442,11 +422,11 @@ export default function Welcome({ auth }) {
                     <div className="px-[5%] grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
                         <div>
                             <span className="text-[#3BE798] font-bold tracking-widest uppercase mb-4 block">The Philosophy</span>
-                            <h2 className="text-5xl lg:text-7xl font-black mb-8 leading-tight tracking-tight">
+                            <h2 className="text-4xl lg:text-6xl font-black mb-8 leading-tight tracking-tight">
                                 WALK YOUR <br />
                                 <span className="text-transparent stroke-text" style={{ WebkitTextStroke: '1px white' }}>OWN PATH</span>
                             </h2>
-                            <p className="text-gray-400 text-lg mb-8 leading-relaxed max-w-md">
+                            <p className="text-gray-400 text-base mb-8 leading-relaxed max-w-md">
                                 We believe style is a language. Every stitch, every curve, every color tells a story of who you are and where you're going. Don't just follow trends—set them.
                             </p>
                             <div className="flex gap-6">
@@ -455,8 +435,8 @@ export default function Welcome({ auth }) {
                                 </Link>
                             </div>
                         </div>
-                        <div className="relative h-[500px] w-full bg-[#222] rounded-[40px] overflow-hidden border border-white/10 group flex items-center justify-center">
-                            <div className="w-[500px] h-[500px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
+                        <div className="relative h-[400px] w-full bg-[#222] rounded-[40px] overflow-hidden border border-white/10 group flex items-center justify-center">
+                            <div className="w-[350px] h-[350px] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                                 <PixelTransition
                                     firstContent={<img src="/images/shoe6.png" className="w-full h-full object-contain -rotate-[20deg] drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] scale-90" />}
                                     secondContent={<img src="/images/shoe5.png" className="w-full h-full object-contain -rotate-[20deg] drop-shadow-[0_20px_50px_rgba(0,0,0,0.5)] scale-90" />}

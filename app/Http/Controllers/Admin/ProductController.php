@@ -8,6 +8,7 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ProductController extends Controller
 {
@@ -17,7 +18,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::with('category')->latest()->paginate(10);
-        return view('admin.products.index', compact('products'));
+        return Inertia::render('Admin/Products/Index', compact('products'));
     }
 
     /**
@@ -71,7 +72,7 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::orderBy('name')->get();
-        return view('admin.products.edit', compact('product', 'categories'));
+        return Inertia::render('Admin/Products/Edit', compact('product', 'categories'));
     }
 
     /**

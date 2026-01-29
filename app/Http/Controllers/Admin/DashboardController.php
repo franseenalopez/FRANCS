@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+use Inertia\Inertia;
+
 class DashboardController extends Controller
 {
     public function index()
@@ -15,6 +17,6 @@ class DashboardController extends Controller
         $totalProducts = \App\Models\Product::count();
         $recentOrders = \App\Models\Order::with('user')->latest()->take(5)->get();
 
-        return view('admin.dashboard', compact('totalSales', 'totalOrders', 'totalCustomers', 'totalProducts', 'recentOrders'));
+        return Inertia::render('Admin/Dashboard', compact('totalSales', 'totalOrders', 'totalCustomers', 'totalProducts', 'recentOrders'));
     }
 }

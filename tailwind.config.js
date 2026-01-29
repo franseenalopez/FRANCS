@@ -16,10 +16,7 @@ export default {
                 sans: ['Inter', 'Figtree', ...defaultTheme.fontFamily.sans],
             },
             colors: {
-                accent: {
-                    DEFAULT: '#C05832', // Terracotta
-                    hover: '#a34626',
-                }
+                accent: '#3BE798', // Green theme
             }
         },
     },

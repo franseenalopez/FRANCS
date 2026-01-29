@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import { useState } from 'react';
+import Navbar from '@/Components/Navbar';
 
 import '../../../css/shop-cards.css';
 
@@ -27,41 +28,29 @@ export default function ShopShow({ auth, product, relatedProducts }) {
 
     return (
         <>
-            <Head title={`${product.name} - Francs`} />
-            <div className="shop-wrapper">
-                {/* Custom Shop Navbar */}
-                <nav className="shop-nav">
-                    <div className="logo">
-                        <Link href="/" className="text-decoration-none text-inherit">
-                            FRANCS<span>.</span>
-                        </Link>
-                    </div>
-                    <div className="nav-links hidden md:flex">
-                        <Link href="/" className="hover:text-inherit">Home</Link>
-                        <Link href={route('shop.index')} className="hover:text-inherit">Store</Link>
-                        <Link href="#" className="hover:text-inherit">Contact</Link>
-                    </div>
-                    <div className="nav-icons">
-                        <i className="fa-regular fa-heart"></i>
-                        <div className="cart-btn">
-                            <i className="fa-solid fa-basket-shopping"></i>
-                            <span className="cart-badge">2</span>
-                        </div>
-                        {auth.user ? (
-                            <Link href={route('dashboard')} className="text-sm font-bold ml-4">Dashboard</Link>
-                        ) : (
-                            <Link href={route('login')} className="text-sm font-bold ml-4">Log In</Link>
-                        )}
-                    </div>
-                </nav>
+            <Head>
+                <title>{`${product.name} - Francs`}</title>
+                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+            </Head>
+            <div className="shop-wrapper pt-32">
+                {/* Universal Navbar */}
+                <Navbar auth={auth} cartCount={2} />
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     {/* Breadcrumb */}
-                    <nav className="text-sm mb-8 font-bold" style={{ color: '#888' }}>
-                        <Link href={route('shop.index')} className="hover:text-[#3BE798]">SHOP</Link>
-                        <span className="mx-2">/</span>
-                        <span className="text-[#2B2B2B]">{product.name.toUpperCase()}</span>
-                    </nav>
+                    <div className="flex items-center gap-4 mb-8">
+                        <Link
+                            href={route('shop.index')}
+                            className="flex items-center gap-2 text-[#2B2B2B] hover:text-[#3BE798] transition font-bold"
+                        >
+                            <i className="fa-solid fa-arrow-left"></i>
+                            Back to Store
+                        </Link>
+                        <span className="text-gray-300">|</span>
+                        <nav className="text-sm font-bold" style={{ color: '#888' }}>
+                            <span className="text-[#2B2B2B]">{product.name.toUpperCase()}</span>
+                        </nav>
+                    </div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         {/* Product Image Stage */}

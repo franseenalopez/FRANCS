@@ -11,11 +11,20 @@ class ShopController extends Controller
 {
     public function index(Request $request)
     {
+
         $query = Product::with('category');
 
-        if ($request->has('category')) {
+        if ($request->filled('category')) {
             $query->whereHas('category', function ($q) use ($request) {
                 $q->where('slug', $request->category);
+            });
+        }
+
+        if ($request->filled('search')) {
+            $searchTerm = strtolower($request->search);
+            $query->where(function ($q) use ($searchTerm) {
+                $q->whereRaw('LOWER(name) LIKE ?', ['%' . $searchTerm . '%'])
+                  ->orWhereRaw('LOWER(description) LIKE ?', ['%' . $searchTerm . '%']);
             });
         }
 
@@ -31,13 +40,16 @@ class ShopController extends Controller
             $query->latest();
         }
 
+        \Illuminate\Support\Facades\Log::info('Shop Index Request:', $request->all());
+        \Illuminate\Support\Facades\Log::info('Filled status:', ['category' => $request->filled('category'), 'search' => $request->filled('search')]);
+
         $products = $query->paginate(12)->withQueryString();
         $categories = Category::all();
 
         return Inertia::render('Shop/Index', [
             'products' => $products,
             'categories' => $categories,
-            'filters' => $request->only(['category', 'sort']),
+            'filters' => $request->only(['category', 'sort', 'search']),
         ]);
     }
 
