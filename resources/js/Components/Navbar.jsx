@@ -16,7 +16,7 @@ export default function Navbar({ auth, cartCount = 0 }) {
                 {['Home', 'Store', 'About', 'Contact'].map((item, index) => (
                     <li key={index}>
                         <Link
-                            href={item === 'Home' ? '/' : item === 'Store' ? route('shop.index') : item === 'About' ? route('about') : '#'}
+                            href={item === 'Home' ? '/' : item === 'Store' ? route('shop.index') : item === 'About' ? route('about') : item === 'Contact' ? route('contact.index') : '#'}
                             className="relative group py-2"
                         >
                             <span className="relative z-10 transition-colors duration-300 group-hover:text-accent">{item}</span>
@@ -89,7 +89,7 @@ export default function Navbar({ auth, cartCount = 0 }) {
                             className="relative hover:text-accent transition-transform duration-200 transform hover:scale-110 overflow-visible"
                             aria-label="Cart"
                         >
-                            <Link href={route('shop.index')}>
+                            <Link href={route('cart.index')}>
                                 {/* Updated Cart Icon to Simple Basket/Bag if needed, currently using Welcome.jsx SVG */}
                                 <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
                             </Link>
