@@ -1,11 +1,18 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { useCart } from '@/Contexts/CartContext';
 
-export default function Navbar({ auth, cartCount = 0 }) {
+export default function Navbar({ auth }) {
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const { openDrawer } = useCart();
+    const { cart } = usePage().props;
+
+    // Calculate total quantity
+    const cartItems = Object.values(cart || {});
+    const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
     return (
-        <nav className="fixed top-6 left-0 right-0 mx-auto w-[90%] md:w-[70%] max-w-[900px] rounded-full bg-white/80 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/40 z-[999] grid grid-cols-[1fr_auto_1fr] items-center px-6 py-2 transition-all duration-300 hover:bg-white/95">
+        <nav className="fixed top-6 left-0 right-0 mx-auto w-[90%] md:w-[70%] max-w-[900px] rounded-full bg-white/80 backdrop-blur-md shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/40 z-[999] flex justify-between items-center px-6 py-2 transition-all duration-300 hover:bg-white/95">
             <div className="justify-self-start">
                 <Link href="/" className="text-lg font-black tracking-tight text-[#1a1a1a] hover:opacity-70 transition-opacity">
                     FRANCS.
@@ -88,11 +95,11 @@ export default function Navbar({ auth, cartCount = 0 }) {
                         <button
                             className="relative hover:text-accent transition-transform duration-200 transform hover:scale-110 overflow-visible"
                             aria-label="Cart"
+                            onClick={openDrawer}
                         >
-                            <Link href={route('cart.index')}>
-                                {/* Updated Cart Icon to Simple Basket/Bag if needed, currently using Welcome.jsx SVG */}
-                                <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
-                            </Link>
+                            {/* Updated Cart Icon to Simple Basket/Bag */}
+                            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path></svg>
+
                             {cartCount > 0 && (
                                 <span className="absolute -top-[6px] -right-[8px] bg-accent text-white text-[0.6rem] w-4 h-4 flex items-center justify-center rounded-full font-extrabold shadow-sm border border-white z-50">
                                     {cartCount}

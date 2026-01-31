@@ -1,15 +1,30 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { useState } from 'react';
 import Navbar from '@/Components/Navbar';
+import { useCart } from '@/Contexts/CartContext';
+import toast from 'react-hot-toast';
 
 import '../../../css/shop-cards.css';
 
 export default function ShopShow({ auth, product, relatedProducts }) {
     const [quantity, setQuantity] = useState(1);
 
+    const { openDrawer } = useCart();
+
     const handleAddToCart = () => {
-        // Placeholder for cart functionality
-        alert(`Added ${quantity} ${product.name}(s) to cart`);
+        router.post('/cart', {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image,
+            quantity: quantity
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success(`Added ${quantity} ${product.name}(s) to cart`);
+                openDrawer();
+            }
+        });
     };
 
     // Helper to determine card class (reused from Index.jsx for consistency)
@@ -32,13 +47,13 @@ export default function ShopShow({ auth, product, relatedProducts }) {
                 <title>{`${product.name} - Francs`}</title>
                 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
             </Head>
-            <div className="shop-wrapper pt-32">
+            <div className="shop-wrapper pt-20">
                 {/* Universal Navbar */}
                 <Navbar auth={auth} />
 
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
                     {/* Breadcrumb */}
-                    <div className="flex items-center gap-4 mb-8">
+                    <div className="flex items-center gap-4 mb-4">
                         <Link
                             href={route('shop.index')}
                             className="flex items-center gap-2 text-[#2B2B2B] hover:text-[#3BE798] transition font-bold"
@@ -89,7 +104,7 @@ export default function ShopShow({ auth, product, relatedProducts }) {
                                 <span className="ml-2 text-sm text-gray-500">(128 Reviews)</span>
                             </div>
 
-                            <p className="text-4xl text-[#2B2B2B] font-bold mb-8">${parseFloat(product.price).toFixed(2)}</p>
+                            <p className="text-4xl text-gray-900 font-bold mb-8">₹{parseFloat(product.price).toFixed(2)}</p>
 
                             <div className="prose text-gray-600 mb-8 max-w-md">
                                 <p>{product.description || "Experience the ultimate comfort and style with this premium addition to your collection. Designed for those who dare to stand out."}</p>

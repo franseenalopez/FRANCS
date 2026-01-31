@@ -16,7 +16,15 @@ class DashboardController extends Controller
         $totalCustomers = \App\Models\User::where('role', '!=', 'admin')->count();
         $totalProducts = \App\Models\Product::count();
         $recentOrders = \App\Models\Order::with('user')->latest()->take(5)->get();
+        $recentActivities = \App\Models\Activity::latest()->take(10)->get()->map(function ($activity) {
+            return [
+                'id' => $activity->id,
+                'description' => $activity->description,
+                'created_at' => $activity->created_at->diffForHumans(),
+                'properties' => json_decode($activity->properties, true), // Decode JSON
+            ];
+        });
 
-        return Inertia::render('Admin/Dashboard', compact('totalSales', 'totalOrders', 'totalCustomers', 'totalProducts', 'recentOrders'));
+        return Inertia::render('Admin/Dashboard', compact('totalSales', 'totalOrders', 'totalCustomers', 'totalProducts', 'recentOrders', 'recentActivities'));
     }
 }

@@ -12,6 +12,22 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            \App\Models\Activity::create([
+                'description' => 'New user registered',
+                'subject_type' => get_class($user),
+                'subject_id' => $user->id,
+                'causer_type' => null, // or current admin if applicable, but usually user registers themselves
+                'causer_id' => null,
+                'properties' => json_encode(['name' => $user->name, 'email' => $user->email]),
+            ]);
+        });
+    }
+
     /**
      * The attributes that are mass assignable.
      *

@@ -9,6 +9,39 @@ class Product extends Model
 {
     use HasFactory;
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updated(function ($product) {
+            if ($product->wasChanged('stock')) {
+                \App\Models\Activity::create([
+                    'description' => 'Product stock updated',
+                    'subject_type' => get_class($product),
+                    'subject_id' => $product->id,
+                    'causer_type' => auth()->check() ? get_class(auth()->user()) : null,
+                    'causer_id' => auth()->id(),
+                    'properties' => json_encode([
+                        'name' => $product->name,
+                        'old_stock' => $product->getOriginal('stock'),
+                        'new_stock' => $product->stock
+                    ]),
+                ]);
+            }
+        });
+
+        static::created(function ($product) {
+             \App\Models\Activity::create([
+                'description' => 'New product added',
+                'subject_type' => get_class($product),
+                'subject_id' => $product->id,
+                'causer_type' => auth()->check() ? get_class(auth()->user()) : null,
+                'causer_id' => auth()->id(),
+                'properties' => json_encode(['name' => $product->name]),
+            ]);
+        });
+    }
+
     protected $fillable = [
         'category_id',
         'name',

@@ -21,7 +21,7 @@ export default function About({ auth }) {
                         {['Home', 'Store', 'About', 'Contact'].map((item, index) => (
                             <li key={index}>
                                 <Link
-                                    href={item === 'Home' ? '/' : item === 'Store' ? route('shop.index') : item === 'About' ? route('about') : '#'}
+                                    href={item === 'Home' ? '/' : item === 'Store' ? route('shop.index') : item === 'About' ? route('about') : item === 'Contact' ? route('contact.index') : '#'}
                                     className="relative group py-2"
                                 >
                                     <span className="relative z-10 transition-colors duration-300 group-hover:text-accent">{item}</span>

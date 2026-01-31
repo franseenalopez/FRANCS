@@ -287,7 +287,7 @@ export default function Welcome({ auth }) {
                 </section>
 
                 {/* Featured Collections (Scrollable Cards) */}
-                <section ref={featuredRef} className="px-[5%] pt-12 pb-0 bg-[#f8f8f8]">
+                <section ref={featuredRef} className="px-[5%] pt-12 pb-32 bg-[#f8f8f8]">
                     <div className="flex justify-between items-end mb-16">
                         <h2 className="text-4xl font-extrabold tracking-tight text-[#2B2B2B] leading-none">FEATURED<br />COLLECTIONS</h2>
                         <Link href={route('shop.index')} className="font-bold border-b-2 border-black pb-0.5 hover:text-[#3BE798] hover:border-[#3BE798] transition-all">
@@ -350,8 +350,9 @@ export default function Welcome({ auth }) {
                 </section>
 
                 {/* Our Innovation Section */}
-                <section ref={innovationRef} className="px-[5%] pt-12 pb-32 bg-[#f8f8f8] relative z-20">
-                    <div className="text-center mb-8">
+                {/* Our Innovation Section */}
+                <section ref={innovationRef} className="px-[5%] pt-32 pb-32 bg-[#f8f8f8] relative z-20">
+                    <div className="text-center mb-16">
                         <span className="text-sm font-bold text-accent tracking-widest uppercase">Why Francs?</span>
                         <h2 className="text-4xl font-extrabold text-[#1a1a1a] mt-2">OUR INNOVATION</h2>
                     </div>
@@ -457,32 +458,23 @@ export default function Welcome({ auth }) {
 
                 {/* Footer */}
                 <footer className="bg-[#1a1a1a] text-white py-16">
-                    <div className="px-[5%] grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-gray-800 pb-12 mb-12">
-                        <div className="md:col-span-1">
+                    <div className="px-[5%] flex flex-col md:flex-row justify-between items-center gap-12 border-b border-gray-800 pb-12 mb-12">
+                        <div className="max-w-md">
                             <Link href="/" className="text-2xl font-black tracking-tighter mb-6 block">FRANCS.</Link>
                             <p className="text-gray-400 text-sm leading-relaxed">
                                 Redefining sneaker culture with premium design and sustainable innovation. Join the movement.
                             </p>
                         </div>
-                        <div>
-                            <h4 className="font-bold mb-6">SHOP</h4>
-                            <ul className="space-y-4 text-gray-400 text-sm">
-                                <li><Link href="#" className="hover:text-[#3BE798] transition">New Arrivals</Link></li>
-                                <li><Link href="#" className="hover:text-[#3BE798] transition">Best Sellers</Link></li>
-                                <li><Link href="#" className="hover:text-[#3BE798] transition">Men</Link></li>
-                                <li><Link href="#" className="hover:text-[#3BE798] transition">Women</Link></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 className="font-bold mb-6">SUPPORT</h4>
-                            <ul className="space-y-4 text-gray-400 text-sm">
-                                <li><Link href="#" className="hover:text-[#3BE798] transition">Help Center</Link></li>
-                                <li><Link href="#" className="hover:text-[#3BE798] transition">Returns & Exchanges</Link></li>
-                                <li><Link href="#" className="hover:text-[#3BE798] transition">Shipping Info</Link></li>
-                                <li><Link href="#" className="hover:text-[#3BE798] transition">Track Order</Link></li>
-                            </ul>
-                        </div>
-                        <div>
+
+                        {/* Simplified Actions */}
+                        <div className="flex gap-8">
+
+                            {!auth.user && (
+                                <>
+                                    <Link href={route('login')} className="text-sm font-bold text-gray-400 hover:text-white transition">Log In</Link>
+                                    <Link href={route('register')} className="text-sm font-bold text-gray-400 hover:text-white transition">Sign Up</Link>
+                                </>
+                            )}
                         </div>
                     </div>
                     <div className="px-[5%] flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">

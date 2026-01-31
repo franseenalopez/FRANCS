@@ -110,9 +110,8 @@ h1.page-title {
     font-weight: 800;
     text-transform: uppercase;
     letter-spacing: -2px;
-    color: white;
-    text-shadow: 2px 2px 0px rgba(0, 0, 0, 0.1);
-    -webkit-text-stroke: 1px var(--dark-grey);
+    color: var(--dark-grey);
+    text-shadow: none;
 }
 
 .filter-bar {
@@ -286,10 +285,12 @@ div[class^="card"] .img::after {
 }
 
 .mores .price {
-    color: #eee;
+    color: white;
     font-weight: 700;
     letter-spacing: 1px;
     font-size: 1.2rem;
+    text-shadow: none;
+    -webkit-text-stroke: 0;
 }
 
 .mores .stars {
@@ -363,6 +364,7 @@ div[class^='card'][class*='seller'] {
 div[class^='card'][class*='seller'] .addCard i {
     border-color: var(--dark-grey);
 }
+
 
 div[class^='card'][class*='out'] {
     filter: grayscale(1);

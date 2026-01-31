@@ -13,6 +13,11 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
 
+        // Redirect admin users to admin dashboard
+        if ($user->email === 'franseenalopez@gmail.com') {
+            return redirect()->route('admin.dashboard');
+        }
+
         // Fetch recent orders
         $recentOrders = Order::where('user_id', $user->id)
             ->withCount('items') 

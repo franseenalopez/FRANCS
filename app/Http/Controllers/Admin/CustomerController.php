@@ -8,14 +8,23 @@ use Inertia\Inertia;
 
 class CustomerController extends Controller
 {
-    public function index()
+    public function index(\Illuminate\Http\Request $request)
     {
-        $customers = User::where('role', '!=', 'admin')
-            ->latest()
-            ->get();
+        $query = User::where('role', '!=', 'admin');
+
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $customers = $query->latest()->get();
 
         return Inertia::render('Admin/Customers/Index', [
-            'customers' => $customers
+            'customers' => $customers,
+            'filters' => $request->only(['search']),
         ]);
     }
 }

@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react'; // ADD
 import Navbar from '@/Components/Navbar';
 import debounce from 'lodash/debounce'; // Make sure lodash is installed, or implement custom debounce
 
+import ShopCard from '@/Components/ShopCard';
 import '../../../css/shop-cards.css'; // Import custom card styles
 
 export default function ShopIndex({ auth, products, categories, filters = {} }) {
@@ -60,19 +61,7 @@ export default function ShopIndex({ auth, products, categories, filters = {} }) 
         updateParams(selectedCategory, sortOption, searchQuery);
     };
 
-    // Helper to determine card class
-    const getCardClass = (product) => {
-        let classes = 'card';
-        if (product.stock <= 0) {
-            classes += '-out';
-        } else {
-            // Demo logic for variety
-            if (product.id % 3 === 0) classes += '-new';
-            else if (product.id % 2 === 0) classes += '-seller';
-            else classes += '-new'; // Default to new for standard look
-        }
-        return classes;
-    };
+
 
     return (
         <>
@@ -169,51 +158,7 @@ export default function ShopIndex({ auth, products, categories, filters = {} }) 
                         </div>
                     ) : (
                         products.data.map(product => (
-                            <Link key={product.id} href={route('shop.show', product.id)} className="block hover:no-underline w-full max-w-[320px]">
-                                <div className={getCardClass(product)}>
-                                    <div className="basicInfo">
-                                        <div className="title">
-                                            <div className="category">
-                                                {product.category?.name || 'Francs'}
-                                            </div>
-                                            <div className="name">{product.name}</div>
-                                        </div>
-
-                                        <div className="colors">
-                                            <div className="ellipse" style={{ background: '#3BE798' }}></div>
-                                            <div className="ellipse" style={{ background: '#2B2B2B' }}></div>
-                                        </div>
-
-                                        <div className="images">
-                                            <div className="img">
-                                                {product.image ? (
-                                                    <img src={`/storage/${product.image}`} alt={product.name} />
-                                                ) : (
-                                                    // Rotate through the static images for variety
-                                                    <img
-                                                        src={`/images/shoe${(product.id % 6) + 1}.png`}
-                                                        alt="Shoe"
-                                                    />
-                                                )}
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                    <div className="addCard">
-                                        <i className={product.stock <= 0 ? "fa-solid fa-ban" : "fa-solid fa-basket-shopping"}></i>
-                                    </div>
-                                    <div className="mores">
-                                        <div className="stars">
-                                            <i className="fa-solid fa-star text-yellow"></i>
-                                            <i className="fa-solid fa-star text-yellow"></i>
-                                            <i className="fa-solid fa-star text-yellow"></i>
-                                            <i className="fa-solid fa-star text-yellow"></i>
-                                            <i className="fa-solid fa-star text-yellow"></i>
-                                        </div>
-                                        <div className="price">₹{parseFloat(product.price).toFixed(2)}</div>
-                                    </div>
-                                </div>
-                            </Link>
+                            <ShopCard key={product.id} product={product} />
                         ))
                     )}
                 </div>

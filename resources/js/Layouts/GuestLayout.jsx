@@ -38,7 +38,9 @@ export default function GuestLayout({ children }) {
             {/* Right Side: Visual */}
             <div className="relative hidden lg:flex flex-col items-center justify-center bg-[#EAEAEA] overflow-hidden">
                 {/* Background Text */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[10rem] xl:text-[14rem] font-black text-[#CCCCCC] leading-none select-none pointer-events-none tracking-tighter z-0">
+                <div
+                    className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[8rem] xl:text-[10rem] font-black leading-none select-none pointer-events-none tracking-tighter z-0 whitespace-nowrap text-gray-400"
+                >
                     ELEGANT
                 </div>
 
