@@ -206,11 +206,13 @@ export default function Welcome({ auth }) {
                             </div>
                         </div>
 
-                        <img
-                            src="/images/shoe3.png"
-                            alt="Francs 2026 Earth Edition"
-                            className="hero-shoe relative w-[65%] max-w-[300px] lg:max-w-[450px] lg:w-[80%] -rotate-[25deg] drop-shadow-[0_35px_35px_rgba(0,0,0,0.25)] z-10 transition-transform duration-700 hover:scale-105 hover:-rotate-[22deg]"
-                        />
+                        <div className="w-full flex justify-center items-center animate-float-slow z-10 relative">
+                            <img
+                                src="/images/shoe3.png"
+                                alt="Francs 2026 Earth Edition"
+                                className="hero-shoe w-[65%] max-w-[300px] lg:max-w-[450px] lg:w-[80%] -rotate-[25deg] drop-shadow-[0_35px_35px_rgba(0,0,0,0.25)] transition-transform duration-700 hover:scale-105 hover:-rotate-[22deg]"
+                            />
+                        </div>
                     </div>
                 </header>
 

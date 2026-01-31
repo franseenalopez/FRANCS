@@ -52,6 +52,10 @@
         animation: float 4s ease-in-out 2s infinite;
     }
 
+    .animate-float-slow {
+        animation: float 6s ease-in-out infinite;
+    }
+
     .bg-dot-pattern {
         background-image: radial-gradient(#e5e5e5 1px, transparent 1px);
         background-size: 24px 24px;
