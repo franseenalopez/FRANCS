@@ -1293,19 +1293,70 @@ if ($request->filled('search')) {
 $products = $query->paginate(12)->withQueryString();
 \end{lstlisting}
 
+
 \subsection{Source Code Screenshots}
-The technical implementation of the Francs platform is documented through the following source code screenshots, highlighting the backend and frontend architecture.
+The following code listings show the actual PHP backend and React frontend implementation of the Francs platform.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{code_laravel.png}
-    \caption{Laravel Backend Implementation - Checkout Controller}
-    \label{fig:code_laravel}
-\end{figure}
+\begin{lstlisting}[style=phpstyle, caption={Laravel Backend -- CheckoutController::store()}, label={lst:checkout}]
+public function store(Request $request)
+{
+    $validated = $request->validate([
+        'firstName'     => 'required|string',
+        'lastName'      => 'required|string',
+        'email'         => 'required|email',
+        'address'       => 'required|string',
+        'city'          => 'required|string',
+        'country'       => 'required|string',
+        'postalCode'    => 'required|string',
+        'paymentMethod' => 'required|in:cod,card',
+    ]);
+    $cart = session('cart', []);
+    if (empty($cart)) {
+        return redirect()->route('shop.index')
+            ->with('error', 'Cart is empty.');
+    }
+    DB::beginTransaction();
+    try {
+        $totalPrice = collect($cart)->sum(
+            fn($i) => $i['price'] * $i['quantity']
+        );
+        $order = Order::create([ /* ... */ ]);
+        foreach ($cart as $id => $item) {
+            OrderItem::create([ /* ... */ ]);
+        }
+        DB::commit();
+        session()->forget('cart');
+        Mail::to($validated['email'])
+            ->send(new OrderPlaced($order));
+        return redirect()->route('checkout.success', $order);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return back()->with('error', 'Order failed.');
+    }
+}
+\end{lstlisting}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{code_react.png}
-    \caption{React.js Frontend Implementation - Shop Page Component}
-    \label{fig:code_react}
-\end{figure}
+\begin{lstlisting}[style=jsstyle, caption={React Frontend -- ShopController Page (excerpt)}, label={lst:shop_react}]
+import React, { useState } from 'react';
+import { router } from '@inertiajs/react';
+
+export default function Shop({ products, categories, filters }) {
+    const [search, setSearch] = useState(filters.search || '');
+
+    const applyFilter = (category) => {
+        router.get('/shop', { category, search },
+            { preserveState: true });
+    };
+
+    const addToCart = (productId, quantity = 1) => {
+        router.post('/cart', { product_id: productId, quantity },
+            { preserveScroll: true });
+    };
+
+    return (
+        <div className="shop-container">
+            {/* Category filter + product grid */}
+        </div>
+    );
+}
+\end{lstlisting}
