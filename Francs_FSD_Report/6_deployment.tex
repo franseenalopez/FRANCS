@@ -3,30 +3,98 @@
 \section{Project Folder Structure}
 The Francs project follows the standard Laravel application directory structure with React components organised under \texttt{resources/js}:
 
-\begin{itemize}
-    \item \textbf{app/} -- PHP application logic:
-        \begin{itemize}
-            \item \texttt{Http/Controllers/} -- Application request handlers.
-            \item \texttt{Models/} -- Eloquent ORM database entities.
-            \item \texttt{Mail/} -- Email notification classes (e.g., \texttt{OrderPlaced}).
-            \item \texttt{Providers/} -- Service registration logic.
-        \end{itemize}
-    \item \textbf{resources/js/} -- React frontend:
-        \begin{itemize}
-            \item \texttt{Pages/} -- Full-page React components (Home, Shop, Admin).
-            \item \texttt{Components/} -- Shared UI elements (CustomDropdown, CartItem).
-            \item \texttt{Layouts/} -- Shared page templates (Authenticated, Guest).
-        \end{itemize}
-    \item \textbf{resources/views/} -- Static Blade root (\texttt{app.blade.php}) and Email templates.
-    \item \textbf{routes/} -- Endpoint definitions (\texttt{web.php}, \texttt{auth.php}, \texttt{console.php}).
-    \item \textbf{database/} -- Migrations, Seeders, and factory definitions.
-    \item \textbf{public/} -- Storage symlinks, entry point (\texttt{index.php}), and compiled assets.
-    \item \textbf{config/} -- Global configuration files (app, database, mail, inertia).
-    \item \textbf{storage/} -- Private log files, session files, and uploaded product images.
-    \item \textbf{vite.config.js} -- Build pipeline configuration for Laravel and React.
-    \item \textbf{package.json} -- Frontend dependencies (React, GSAP, Tailwind, Inertia).
-    \item \textbf{composer.json} -- Backend dependencies (Laravel, Socialite, Breeze).
-\end{itemize}
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  folder/.style={rectangle, draw, fill=blue!10, font=\small\bfseries, inner sep=3pt, minimum width=3cm, align=left},
+  file/.style={rectangle, draw=gray!50, fill=gray!5, font=\scriptsize, inner sep=2pt, minimum width=2.5cm, align=left},
+  edge from parent/.style={draw, -{Latex[length=1.5mm]}},
+  sibling distance=3.5cm,
+  level distance=1.2cm,
+  every node/.style={scale=0.83}
+]
+\node[folder] {FRANCS/ (root)}
+  child { node[folder] {app/}
+    child { node[file] {Http/Controllers/} }
+    child { node[file] {Models/} }
+    child { node[file] {Mail/} }
+    child { node[file] {Providers/} }
+  }
+  child { node[folder] {resources/js/}
+    child { node[file] {Pages/} }
+    child { node[file] {Components/} }
+    child { node[file] {Layouts/} }
+  }
+  child { node[folder] {database/}
+    child { node[file] {migrations/} }
+    child { node[file] {seeders/} }
+  }
+  child { node[folder] {routes/}
+    child { node[file] {web.php} }
+    child { node[file] {auth.php} }
+    child { node[file] {console.php} }
+  }
+  child { node[folder] {config/} }
+  child { node[folder] {public/} }
+  child { node[folder] {storage/} }
+  child { node[file] {.env} }
+  child { node[file] {composer.json} }
+  child { node[file] {package.json} }
+  child { node[file] {vite.config.js} };
+\end{tikzpicture}
+\caption{Francs Project Folder Structure}
+\label{fig:folder_structure}
+\end{figure}
+
+\section{Development Pipeline Diagram}
+The following diagram illustrates the development and deployment pipeline for the Francs platform.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  stage/.style={rectangle, draw, thick, rounded corners=4pt, minimum width=2.5cm, minimum height=1.1cm, align=center, font=\small\bfseries, fill=blue!10},
+  substep/.style={font=\scriptsize, text=gray!80, align=center},
+  arr/.style={{Latex[length=2mm]}-{Latex[length=2mm]}, thick, blue!50},
+  fwd/.style={-{Latex[length=2mm]}, thick, blue!60},
+  every node/.style={scale=0.9}
+]
+
+\node[stage, fill=green!12]  (code)    at (0,0)    {CODE\\(VS Code)};
+\node[stage, fill=yellow!20] (git)     at (3.5,0)  {VERSION\\CONTROL\\(Git / GitHub)};
+\node[stage, fill=blue!12]   (install) at (7.5,0)  {INSTALL\\DEPS\\(composer /npm)};
+\node[stage, fill=orange!15] (build)   at (11.5,0) {BUILD\\ASSETS\\(Vite)};
+\node[stage, fill=purple!12] (test)    at (0,-3)   {TEST\\(Manual /\\Tinker)};
+\node[stage, fill=teal!12]   (migrate) at (3.5,-3) {MIGRATE\\DB\\(artisan migrate)};
+\node[stage, fill=red!10]    (serve)   at (7.5,-3) {SERVE\\LOCAL\\(artisan serve)};
+\node[stage, fill=gray!15]   (deploy)  at (11.5,-3){DEPLOY\\(PHP 8.2+ Host\\/ Cloud)};
+
+% Sub-step labels
+\node[substep] at (0,-0.9)    {Write PHP / JSX};
+\node[substep] at (3.5,-0.9)  {git commit \& push};
+\node[substep] at (7.5,-0.9)  {dependencies};
+\node[substep] at (11.5,-0.9) {npm run build};
+\node[substep] at (0,-3.9)    {php artisan tinker};
+\node[substep] at (3.5,-3.9)  {pgsql migrations};
+\node[substep] at (7.5,-3.9)  {localhost:8000};
+\node[substep] at (11.5,-3.9) {Nginx / Apache};
+
+% Forward arrows (top row)
+\draw[fwd] (code)    -- (git);
+\draw[fwd] (git)     -- (install);
+\draw[fwd] (install) -- (build);
+% Turn down
+\draw[fwd] (build.south) -- ++(0,-0.6) -- ++(0,-0.6) -- (deploy.north);
+% Bottom row (right to left)
+\draw[fwd] (deploy)  -- (serve);
+\draw[fwd] (serve)   -- (migrate);
+\draw[fwd] (migrate) -- (test);
+% Feedback loop
+\draw[fwd, dashed] (test.north) -- ++(0,0.6) -- ++(-1,0) |- (code.south);
+
+\end{tikzpicture}
+\caption{Francs Development Pipeline Diagram}
+\label{fig:pipeline}
+\end{figure}
 
 \section{Local Development Setup}
 To run the Francs application locally, the following commands are executed:

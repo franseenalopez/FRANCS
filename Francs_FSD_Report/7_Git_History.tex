@@ -19,4 +19,50 @@ Version control is managed through Git and GitHub, enabling efficient collaborat
 \end{itemize}
 
 \noindent The repository is hosted at:\\
-\textbf{GitHub: https://github.com/AshleyImmanuel/francs}
+\textbf{GitHub: https://github.com/franseenalopez/FRANCS}
+
+\section{Git Commit Timeline Diagram}
+The following diagram illustrates the key commit milestones on the \texttt{main} branch throughout the development of the Francs platform.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  commit/.style={circle, draw, fill=blue!60, text=white, font=\scriptsize\bfseries, minimum size=0.55cm, inner sep=1pt},
+  msg/.style={rectangle, draw=gray!50, fill=gray!8, font=\scriptsize, align=left, inner sep=4pt, minimum width=5.5cm},
+  branch/.style={thick, blue!60},
+  every node/.style={scale=0.88}
+]
+% Main branch line
+\draw[branch, line width=2pt] (0,0) -- (0,-13.5);
+
+% Commits (circle + label)
+\node[commit] (c1) at (0, 0)    {C1};
+\node[commit] (c2) at (0,-1.5)  {C2};
+\node[commit] (c3) at (0,-3.0)  {C3};
+\node[commit] (c4) at (0,-4.5)  {C4};
+\node[commit] (c5) at (0,-6.0)  {C5};
+\node[commit] (c6) at (0,-7.5)  {C6};
+\node[commit] (c7) at (0,-9.0)  {C7};
+\node[commit] (c8) at (0,-10.5) {C8};
+\node[commit] (c9) at (0,-12.0) {C9};
+\node[commit] (c10)at (0,-13.5) {C10};
+
+% Messages (right side) -- alternating left/right
+\node[msg, anchor=west] at (0.5, 0)    {Initial scaffold: Laravel 12 + Inertia.js + React};
+\node[msg, anchor=west] at (0.5,-1.5)  {Database migrations: users, categories, products};
+\node[msg, anchor=west] at (0.5,-3.0)  {Orders, order\_items, reviews, activities tables};
+\node[msg, anchor=west] at (0.5,-4.5)  {Cart (session) + CheckoutController (transaction)};
+\node[msg, anchor=west] at (0.5,-6.0)  {Google OAuth via Laravel Socialite};
+\node[msg, anchor=west] at (0.5,-7.5)  {Admin dashboard: Product \& Category CRUD};
+\node[msg, anchor=west] at (0.5,-9.0)  {Email notification on order (Mail + Gmail SMTP)};
+\node[msg, anchor=west] at (0.5,-10.5) {Activity logging, Review system, Community page};
+\node[msg, anchor=west] at (0.5,-12.0) {Cloudinary image upload, GSAP animations};
+\node[msg, anchor=west] at (0.5,-13.5) {Bug fixes, UI polish, FSD report updates};
+
+% Branch label
+\node[font=\small\bfseries\color{blue!70}, anchor=south] at (0, 0.5) {main};
+
+\end{tikzpicture}
+\caption{Git Commit Timeline -- Francs Development History}
+\label{fig:git_timeline}
+\end{figure}
