@@ -4,11 +4,75 @@
 
 The Francs system has two primary actors: \textbf{Customer} and \textbf{Administrator}. The following diagram illustrates the interactions between the actors and the system use cases.
 
+% ===================== USE CASE DIAGRAM (TikZ) =====================
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{use_case_diagram.png}
-    \caption{Use Case Diagram of Francs Platform}
-    \label{fig:use_case}
+\centering
+\begin{tikzpicture}[
+  actor/.style={align=center, font=\small\bfseries},
+  usecase/.style={ellipse, draw, align=center, font=\small, minimum width=3.2cm, minimum height=0.8cm, fill=blue!5},
+  sysbox/.style={draw, rectangle, thick, inner sep=8pt},
+  dasharrow/.style={dashed, -{Latex[length=2mm]}},
+  scale=0.85, every node/.style={scale=0.85}
+]
+
+% System boundary
+\node[sysbox, minimum width=11cm, minimum height=15cm] (sys) at (5.5,0) {};
+\node[font=\bfseries\small] at (5.5, 7.3) {Francs System};
+
+% --- CUSTOMER (left) ---
+% Actor
+\node[actor] (cust) at (-1.5, 3) {\includegraphics[width=0.4cm]{example-image-a}\\[2pt]Customer};
+% Draw stick figure manually
+\draw (-1.5,3.9) circle (0.25cm);
+\draw (-1.5,3.65) -- (-1.5,3.0);
+\draw (-1.5,3.5) -- (-1.9,3.2) (-1.5,3.5) -- (-1.1,3.2);
+\draw (-1.5,3.0) -- (-1.8,2.5) (-1.5,3.0) -- (-1.2,2.5);
+\node[font=\small\bfseries] at (-1.5,2.3) {Customer};
+
+% Customer use cases
+\node[usecase] (uc1)  at (3.2, 6.2) {Register / Login};
+\node[usecase] (uc2)  at (3.2, 5.0) {Sign In with Google};
+\node[usecase] (uc3)  at (3.2, 3.8) {Browse Products};
+\node[usecase] (uc4)  at (3.2, 2.6) {Search Products};
+\node[usecase] (uc5)  at (3.2, 1.4) {Filter by Category};
+\node[usecase] (uc6)  at (3.2, 0.2) {View Product Details};
+\node[usecase] (uc7)  at (3.2,-1.0) {Add to Cart};
+\node[usecase] (uc8)  at (3.2,-2.2) {Checkout};
+\node[usecase] (uc9)  at (3.2,-3.4) {Submit Review};
+\node[usecase] (uc10) at (3.2,-4.6) {View Order History};
+\node[usecase] (uc11) at (3.2,-5.8) {Manage Profile};
+
+% Admin use cases
+\node[usecase] (ua1) at (8.0, 6.2) {Login to Admin Panel};
+\node[usecase] (ua2) at (8.0, 5.0) {Manage Products};
+\node[usecase] (ua3) at (8.0, 3.8) {Manage Categories};
+\node[usecase] (ua4) at (8.0, 2.6) {View \& Update Orders};
+\node[usecase] (ua5) at (8.0, 1.4) {View Customer List};
+\node[usecase] (ua6) at (8.0, 0.2) {View Vendor List};
+\node[usecase] (ua7) at (8.0,-1.0) {Monitor Activity Log};
+\node[usecase] (ua8) at (8.0,-2.2) {View Order Confirmation};
+
+% --- ADMIN (right) ---
+\draw (12.5,3.9) circle (0.25cm);
+\draw (12.5,3.65) -- (12.5,3.0);
+\draw (12.5,3.5) -- (12.9,3.2) (12.5,3.5) -- (12.1,3.2);
+\draw (12.5,3.0) -- (12.8,2.5) (12.5,3.0) -- (12.2,2.5);
+\node[font=\small\bfseries] at (12.5,2.3) {Administrator};
+
+% Customer associations (solid lines, no arrowhead)
+\foreach \uc in {uc1,uc2,uc3,uc4,uc5,uc6,uc7,uc8,uc9,uc10,uc11}
+  \draw (-1.1,3.4) -- (\uc);
+% Admin associations
+\foreach \ua in {ua1,ua2,ua3,ua4,ua5,ua6,ua7,ua8}
+  \draw (12.1,3.4) -- (\ua);
+
+% <<include>> / <<extend>> relationships (dashed arrows)
+\draw[dasharrow] (uc8) -- node[above, font=\tiny] {$\langle\langle$include$\rangle\rangle$} (ua8);
+\draw[dasharrow] (uc2) -- node[right, font=\tiny, pos=0.4] {$\langle\langle$extend$\rangle\rangle$} (uc1);
+
+\end{tikzpicture}
+\caption{Use Case Diagram of Francs Platform}
+\label{fig:use_case}
 \end{figure}
 
 \section{Activity Diagram}
@@ -19,11 +83,84 @@ The customer shopping flow begins at the landing page. The customer browses prod
 \subsection{Order Checkout Sequence}
 The following sequence diagram provides a detailed view of the interactions between the Customer, the Application Logic, and the Database during a successful checkout operation.
 
+% ===================== SEQUENCE DIAGRAM (TikZ) =====================
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{sequence_diagram.png}
-    \caption{Order Checkout Sequence Diagram}
-    \label{fig:sequence_checkout}
+\centering
+\begin{tikzpicture}[
+  lifeline/.style={dashed, thick},
+  msg/.style={-{Latex[length=2mm]}, thick},
+  retmsg/.style={dashed, -{Latex[length=2mm]}},
+  actbar/.style={rectangle, draw, fill=white, minimum width=0.25cm},
+  fragbox/.style={draw, rectangle, rounded corners=2pt, fill=gray!10},
+  participant/.style={draw, rectangle, fill=blue!10, font=\small\bfseries, minimum height=0.6cm, minimum width=2.5cm, align=center},
+  scale=0.78, every node/.style={scale=0.78}
+]
+
+% --- Participants ---
+\node[participant] (P1) at (0,0)   {:Customer};
+\node[participant] (P2) at (3.5,0) {:Browser\\/ React};
+\node[participant] (P3) at (7.5,0) {:CheckoutController};
+\node[participant] (P4) at (11.5,0){:Database\\(PostgreSQL)};
+\node[participant] (P5) at (15,0)  {:MailService\\(Gmail)};
+
+% --- Lifelines (dashed vertical) ---
+\draw[lifeline] (0,-0.5)  -- (0,-15);
+\draw[lifeline] (3.5,-0.5)-- (3.5,-15);
+\draw[lifeline] (7.5,-0.5)-- (7.5,-15);
+\draw[lifeline] (11.5,-0.5)--(11.5,-15);
+\draw[lifeline] (15,-0.5) -- (15,-15);
+
+% --- Activation bars ---
+\fill[white!80!gray, draw=black] (7.4,-1.2) rectangle (7.6,-13);
+\fill[white!80!gray, draw=black] (11.4,-2.8) rectangle (11.6,-7.5);
+
+% --- Messages ---
+% 1. Customer fills form
+\draw[msg] (0,-1.2) -- node[above,font=\scriptsize] {1. fillCheckoutForm()} (3.35,-1.2);
+% 2. POST /checkout
+\draw[msg] (3.5,-1.8) -- node[above,font=\scriptsize] {2. POST /checkout (form data)} (7.4,-1.8);
+% 3. Self-call: validate
+\draw[msg] (7.6,-2.2) -- ++(0.6,0) -- ++(0,-0.4) -- node[right,font=\scriptsize]{3. validateInput()} ++(-0.6,0);
+% OPT frame
+\node[fragbox, minimum width=5.5cm, minimum height=0.7cm, anchor=north west, font=\scriptsize] at (5.5,-2.8) {};
+\node[font=\scriptsize\bfseries] at (5.9,-3.0) {opt};
+\node[font=\scriptsize] at (7.8,-3.1) {[cart empty]};
+\draw[retmsg] (7.4,-3.3) -- node[above,font=\scriptsize] {redirect to /shop} (3.5,-3.3);
+% 4. beginTransaction
+\draw[msg] (7.6,-4.0) -- node[above,font=\scriptsize] {4. beginTransaction()} (11.4,-4.0);
+% 5. INSERT orders
+\draw[msg] (7.6,-5.0) -- node[above,font=\scriptsize] {5. INSERT INTO orders} (11.4,-5.0);
+% 6. Return order ID
+\draw[retmsg] (11.4,-5.6) -- node[above,font=\scriptsize] {Order ID returned} (7.6,-5.6);
+% LOOP frame
+\node[fragbox, minimum width=5.5cm, minimum height=0.7cm, anchor=north west, font=\scriptsize] at (5.5,-6.0) {};
+\node[font=\scriptsize\bfseries] at (5.9,-6.2) {loop};
+\node[font=\scriptsize] at (8.0,-6.3) {[each cart item]};
+\draw[msg] (7.6,-6.8) -- node[above,font=\scriptsize] {6. INSERT INTO order\_items} (11.4,-6.8);
+% 7. commit
+\draw[msg] (7.6,-7.5) -- node[above,font=\scriptsize] {7. commit()} (11.4,-7.5);
+% 8. clear cart self-msg
+\draw[msg] (7.6,-8.3) -- ++(0.6,0) -- ++(0,-0.4) -- node[right,font=\scriptsize]{8. session()->forget('cart')} ++(-0.6,0);
+% 9. send mail (async, open arrowhead)
+\draw[-{Latex[open, length=2mm]}, thick] (7.6,-9.2) -- node[above,font=\scriptsize] {9. send(OrderPlaced) [async]} (14.9,-9.2);
+% 10. Email to customer
+\draw[retmsg] (14.9,-10.0) -- node[above,font=\scriptsize] {10. Order Confirmation Email} (0,-10.0);
+% 11. redirect success
+\draw[retmsg] (7.4,-11.0) -- node[above,font=\scriptsize] {11. redirect /checkout/success/\{id\}} (3.5,-11.0);
+% 12. show page
+\draw[retmsg] (3.5,-11.8) -- node[above,font=\scriptsize] {12. Show Order Success Page} (0,-11.8);
+
+% ALT frame (exception)
+\node[fragbox, minimum width=9cm, minimum height=1.2cm, anchor=north west, font=\scriptsize] at (5.5,-12.3) {};
+\node[font=\scriptsize\bfseries] at (5.9,-12.5) {alt};
+\node[font=\scriptsize] at (8.0,-12.6) {[on DB exception]};
+\draw[retmsg] (11.4,-13.1) -- node[above,font=\scriptsize] {exception thrown} (7.6,-13.1);
+\draw[msg] (7.6,-13.6) -- node[above,font=\scriptsize] {rollback()} (11.4,-13.6);
+\draw[retmsg] (7.4,-14.2) -- node[above,font=\scriptsize] {show error} (3.5,-14.2);
+
+\end{tikzpicture}
+\caption{Order Checkout Sequence Diagram}
+\label{fig:sequence_checkout}
 \end{figure}
 
 \subsection{Admin Product Management Flow}
@@ -34,11 +171,185 @@ An administrator can create a product by filling in the product form (name, desc
 \subsection{Entity Relationship Description}
 The database consists of nine primary tables. The following Entity Relationship Diagram (ERD) illustrates the logical relationships between these entities, including foreign key constraints and cardinality.
 
+% ===================== ERD (TikZ - Relational Style with all 14 tables) =====================
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{erd_diagram.png}
-    \caption{Entity Relationship Diagram (ERD) -- Francs PostgreSQL Database}
-    \label{fig:erd}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  entity/.style={rectangle, draw, thick, fill=blue!10, font=\bfseries\small, minimum width=2.8cm, minimum height=0.7cm, align=center},
+  attr/.style={draw, fill=white, font=\scriptsize, minimum width=2.6cm, align=left, inner sep=2pt},
+  sysnode/.style={rectangle, draw, dashed, fill=gray!8, font=\small, minimum width=2.8cm, minimum height=0.7cm, align=center},
+  sysattr/.style={draw=gray!60, fill=gray!5, font=\scriptsize, minimum width=2.6cm, align=left, inner sep=2pt},
+  rel/.style={thick},
+  FK/.style={font=\scriptsize\itshape\color{red!70!black}}
+]
+
+%% ---- BUSINESS TABLES ----
+
+% USERS
+\node[entity] (users) at (0,0) {users};
+\node[attr, below=0pt of users, anchor=north] (u1) {\underline{id} BIGINT PK};
+\node[attr, below=0pt of u1, anchor=north] (u2) {name VARCHAR};
+\node[attr, below=0pt of u2, anchor=north] (u3) {email VARCHAR UNIQUE};
+\node[attr, below=0pt of u3, anchor=north] (u4) {password VARCHAR};
+\node[attr, below=0pt of u4, anchor=north] (u5) {role VARCHAR (customer)};
+\node[attr, below=0pt of u5, anchor=north] (u6) {\color{red!70!black}google\_id NULL};
+\node[attr, below=0pt of u6, anchor=north] (u7) {\color{red!70!black}avatar NULL};
+\node[attr, below=0pt of u7, anchor=north] (u8) {email\_verified\_at NULL};
+\node[attr, below=0pt of u8, anchor=north] (u9) {remember\_token NULL};
+\node[attr, below=0pt of u9, anchor=north] (u10) {created\_at, updated\_at};
+
+% CATEGORIES
+\node[entity] (cats) at (4,0) {categories};
+\node[attr, below=0pt of cats, anchor=north] (c1) {\underline{id} BIGINT PK};
+\node[attr, below=0pt of c1, anchor=north] (c2) {name VARCHAR};
+\node[attr, below=0pt of c2, anchor=north] (c3) {slug VARCHAR UNIQUE};
+\node[attr, below=0pt of c3, anchor=north] (c4) {\color{red!70!black}parent\_id FK NULL (self)};
+\node[attr, below=0pt of c4, anchor=north] (c5) {image NULL};
+\node[attr, below=0pt of c5, anchor=north] (c6) {description NULL};
+\node[attr, below=0pt of c6, anchor=north] (c7) {is\_active BOOLEAN};
+\node[attr, below=0pt of c7, anchor=north] (c8) {created\_at, updated\_at};
+
+% PRODUCTS
+\node[entity] (prods) at (8,0) {products};
+\node[attr, below=0pt of prods, anchor=north] (p1) {\underline{id} BIGINT PK};
+\node[attr, below=0pt of p1, anchor=north] (p2) {\color{red!70!black}category\_id FK};
+\node[attr, below=0pt of p2, anchor=north] (p3) {name VARCHAR};
+\node[attr, below=0pt of p3, anchor=north] (p4) {slug VARCHAR UNIQUE};
+\node[attr, below=0pt of p4, anchor=north] (p5) {description TEXT NULL};
+\node[attr, below=0pt of p5, anchor=north] (p6) {price DECIMAL(10,2)};
+\node[attr, below=0pt of p6, anchor=north] (p7) {stock INTEGER};
+\node[attr, below=0pt of p7, anchor=north] (p8) {image NULL, images JSON};
+\node[attr, below=0pt of p8, anchor=north] (p9) {is\_active, is\_featured};
+\node[attr, below=0pt of p9, anchor=north] (p10) {created\_at, updated\_at};
+
+% ORDERS
+\node[entity] (ords) at (12,0) {orders};
+\node[attr, below=0pt of ords, anchor=north] (o1) {\underline{id} BIGINT PK};
+\node[attr, below=0pt of o1, anchor=north] (o2) {\color{red!70!black}user\_id FK NULL};
+\node[attr, below=0pt of o2, anchor=north] (o3) {status VARCHAR (pending)};
+\node[attr, below=0pt of o3, anchor=north] (o4) {total\_price DECIMAL(10,2)};
+\node[attr, below=0pt of o4, anchor=north] (o5) {payment\_status};
+\node[attr, below=0pt of o5, anchor=north] (o6) {payment\_method NULL};
+\node[attr, below=0pt of o6, anchor=north] (o7) {shipping\_address TEXT};
+\node[attr, below=0pt of o7, anchor=north] (o8) {billing\_address NULL};
+\node[attr, below=0pt of o8, anchor=north] (o9) {notes NULL};
+\node[attr, below=0pt of o9, anchor=north] (o10) {created\_at, updated\_at};
+
+% ORDER_ITEMS
+\node[entity] (oitems) at (16,0) {order\_items};
+\node[attr, below=0pt of oitems, anchor=north] (oi1) {\underline{id} BIGINT PK};
+\node[attr, below=0pt of oi1, anchor=north] (oi2) {\color{red!70!black}order\_id FK};
+\node[attr, below=0pt of oi2, anchor=north] (oi3) {\color{red!70!black}product\_id FK NULL};
+\node[attr, below=0pt of oi3, anchor=north] (oi4) {product\_name VARCHAR};
+\node[attr, below=0pt of oi4, anchor=north] (oi5) {quantity INTEGER};
+\node[attr, below=0pt of oi5, anchor=north] (oi6) {price DECIMAL(10,2)};
+\node[attr, below=0pt of oi6, anchor=north] (oi7) {total DECIMAL(10,2)};
+\node[attr, below=0pt of oi7, anchor=north] (oi8) {created\_at, updated\_at};
+
+% REVIEWS
+\node[entity] (revs) at (4,-8) {reviews};
+\node[attr, below=0pt of revs, anchor=north] (r1) {\underline{id} BIGINT PK};
+\node[attr, below=0pt of r1, anchor=north] (r2) {\color{red!70!black}user\_id FK};
+\node[attr, below=0pt of r2, anchor=north] (r3) {\color{red!70!black}product\_id FK};
+\node[attr, below=0pt of r3, anchor=north] (r4) {rating TINYINT (1-5)};
+\node[attr, below=0pt of r4, anchor=north] (r5) {comment TEXT NULL};
+\node[attr, below=0pt of r5, anchor=north] (r6) {created\_at, updated\_at};
+
+% ACTIVITIES
+\node[entity] (acts) at (8,-8) {activities};
+\node[attr, below=0pt of acts, anchor=north] (a1) {\underline{id} BIGINT PK};
+\node[attr, below=0pt of a1, anchor=north] (a2) {description VARCHAR};
+\node[attr, below=0pt of a2, anchor=north] (a3) {subject\_type NULL};
+\node[attr, below=0pt of a3, anchor=north] (a4) {subject\_id NULL};
+\node[attr, below=0pt of a4, anchor=north] (a5) {causer\_type NULL};
+\node[attr, below=0pt of a5, anchor=north] (a6) {causer\_id NULL};
+\node[attr, below=0pt of a6, anchor=north] (a7) {properties JSON NULL};
+\node[attr, below=0pt of a7, anchor=north] (a8) {created\_at, updated\_at};
+
+% SESSIONS
+\node[entity] (sess) at (12,-8) {sessions};
+\node[attr, below=0pt of sess, anchor=north] (s1) {\underline{id} VARCHAR PK};
+\node[attr, below=0pt of s1, anchor=north] (s2) {\color{red!70!black}user\_id FK NULL};
+\node[attr, below=0pt of s2, anchor=north] (s3) {ip\_address VARCHAR(45)};
+\node[attr, below=0pt of s3, anchor=north] (s4) {user\_agent TEXT NULL};
+\node[attr, below=0pt of s4, anchor=north] (s5) {payload LONGTEXT};
+\node[attr, below=0pt of s5, anchor=north] (s6) {last\_activity INTEGER};
+
+% PASSWORD_RESET_TOKENS
+\node[entity] (pwrt) at (16,-8) {password\_reset\_tokens};
+\node[attr, below=0pt of pwrt, anchor=north] (pw1) {\underline{email} VARCHAR PK};
+\node[attr, below=0pt of pw1, anchor=north] (pw2) {token VARCHAR};
+\node[attr, below=0pt of pw2, anchor=north] (pw3) {created\_at TIMESTAMP NULL};
+
+%% ---- SYSTEM / INFRA TABLES ----
+\node[font=\small\bfseries\color{gray}] at (8,-15.5) {-- System / Infrastructure Tables --};
+
+% CACHE
+\node[sysnode] (cache) at (0,-16.5) {cache};
+\node[sysattr, below=0pt of cache, anchor=north] (ca1) {\underline{key} VARCHAR PK};
+\node[sysattr, below=0pt of ca1, anchor=north] (ca2) {value MEDIUMTEXT};
+\node[sysattr, below=0pt of ca2, anchor=north] (ca3) {expiration INTEGER};
+
+% CACHE_LOCKS
+\node[sysnode] (calock) at (4,-16.5) {cache\_locks};
+\node[sysattr, below=0pt of calock, anchor=north] (cl1) {\underline{key} VARCHAR PK};
+\node[sysattr, below=0pt of cl1, anchor=north] (cl2) {owner VARCHAR};
+\node[sysattr, below=0pt of cl2, anchor=north] (cl3) {expiration INTEGER};
+
+% JOBS
+\node[sysnode] (jobs) at (8,-16.5) {jobs};
+\node[sysattr, below=0pt of jobs, anchor=north] (j1) {\underline{id} BIGINT PK};
+\node[sysattr, below=0pt of j1, anchor=north] (j2) {queue VARCHAR};
+\node[sysattr, below=0pt of j2, anchor=north] (j3) {payload LONGTEXT};
+\node[sysattr, below=0pt of j3, anchor=north] (j4) {attempts TINYINT};
+\node[sysattr, below=0pt of j4, anchor=north] (j5) {reserved\_at NULL};
+\node[sysattr, below=0pt of j5, anchor=north] (j6) {available\_at, created\_at};
+
+% JOB_BATCHES
+\node[sysnode] (jobbatch) at (12,-16.5) {job\_batches};
+\node[sysattr, below=0pt of jobbatch, anchor=north] (jb1) {\underline{id} VARCHAR PK};
+\node[sysattr, below=0pt of jb1, anchor=north] (jb2) {name VARCHAR};
+\node[sysattr, below=0pt of jb2, anchor=north] (jb3) {total\_jobs, pending\_jobs};
+\node[sysattr, below=0pt of jb3, anchor=north] (jb4) {failed\_jobs INTEGER};
+\node[sysattr, below=0pt of jb4, anchor=north] (jb5) {options NULL};
+\node[sysattr, below=0pt of jb5, anchor=north] (jb6) {created\_at, finished\_at};
+
+% FAILED_JOBS
+\node[sysnode] (fjobs) at (16,-16.5) {failed\_jobs};
+\node[sysattr, below=0pt of fjobs, anchor=north] (fj1) {\underline{id} BIGINT PK};
+\node[sysattr, below=0pt of fj1, anchor=north] (fj2) {uuid VARCHAR UNIQUE};
+\node[sysattr, below=0pt of fj2, anchor=north] (fj3) {connection TEXT};
+\node[sysattr, below=0pt of fj3, anchor=north] (fj4) {payload LONGTEXT};
+\node[sysattr, below=0pt of fj4, anchor=north] (fj5) {exception LONGTEXT};
+\node[sysattr, below=0pt of fj5, anchor=north] (fj6) {failed\_at TIMESTAMP};
+
+%% ---- RELATIONSHIP LINES with cardinality ----
+% users 1---N orders
+\draw[rel] (o2.west) -- ++(-0.3,0) |- (users.east) node[pos=0.5,above,font=\scriptsize]{1} node[near start,above,font=\scriptsize]{N};
+% categories 1---N products
+\draw[rel] (p2.west) -- ++(-0.3,0) |- (cats.east) node[pos=0.5,above,font=\scriptsize]{1} node[near start,above,font=\scriptsize]{N};
+% orders 1---N order_items
+\draw[rel] (oi2.west) -- ++(-0.3,0) |- (ords.east) node[pos=0.5,above,font=\scriptsize]{1} node[near start,above,font=\scriptsize]{N};
+% products 1---N order_items
+\draw[rel] (oi3.north) -- ++(0,0.2) -| (prods.south) node[pos=0.2,right,font=\scriptsize]{1} node[near start,right,font=\scriptsize]{N};
+% users 1---N reviews
+\draw[rel] (r2.west) -- ++(-0.3,0) |- (users.south) node[pos=0.5,left,font=\scriptsize]{1} node[near start,left,font=\scriptsize]{N};
+% products 1---N reviews
+\draw[rel] (r3.north) -- ++(0,0.2) |- (prods.south) node[pos=0.3,right,font=\scriptsize]{1} node[near start,right,font=\scriptsize]{N};
+% users 1---N activities
+\draw[rel] (a6.north) -- ++(0,0.2) |- (users.south) node[pos=0.3,left,font=\scriptsize]{1} node[near start,left,font=\scriptsize]{N};
+% users 1---N sessions
+\draw[rel] (s2.north) -- ++(0,0.2) |- (users.south) node[pos=0.3,right,font=\scriptsize]{1} node[near start,right,font=\scriptsize]{N};
+% users 1---1 password_reset_tokens
+\draw[rel] (pw1.north) -- ++(0,0.2) |- node[pos=0.3,above,font=\scriptsize]{1:1} (users.south);
+% categories self-reference
+\draw[rel] (c4.east) -- ++(0.5,0) |- ++(0,1.5) node[right,font=\scriptsize]{self} -| (cats.north);
+
+\end{tikzpicture}
+}%
+\caption{Entity Relationship Diagram (ERD) -- Francs PostgreSQL Database (All 14 Tables)}
+\label{fig:erd}
 \end{figure}
 
 The primary tables are:
@@ -384,11 +695,227 @@ The Francs frontend is built with React components and Tailwind CSS. The UI cons
 \subsection{Class Diagram}
 The following class diagram represents the core Model-Controller-View architecture of the Francs platform, illustrating the relationships between the Eloquent models and their corresponding controllers.
 
+% ===================== CLASS DIAGRAM (TikZ - proper UML) =====================
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=1\textwidth]{class_diagram.png}
-    \caption{MVC Class Diagram of Francs Platform}
-    \label{fig:class_diagram}
+\centering
+\resizebox{\textwidth}{!}{%
+\begin{tikzpicture}[
+  ctrlbox/.style={rectangle split, rectangle split parts=3, draw, thick,
+    rectangle split part fill={blue!15, white, white},
+    font=\small, align=left, minimum width=3.5cm, inner sep=2pt},
+  modelbox/.style={rectangle split, rectangle split parts=3, draw, thick,
+    rectangle split part fill={green!15, white, white},
+    font=\small, align=left, minimum width=3.5cm, inner sep=2pt},
+  dep/.style={dashed, -{Latex[length=2mm]}},
+  assoc/.style={thick},
+  comp/.style={thick, diamond-},
+  agg/.style={thick, open diamond-},
+  every node/.style={scale=0.82}
+]
+
+%% ---- CONTROLLERS (top row) ----
+\node[ctrlbox] (SC) at (0,0) {
+  \textbf{ShopController}
+  \nodepart{two}
+  \nodepart{three}
+  +index(req:Request): Response\\
+  +show(p:Product): Response
+};
+
+\node[ctrlbox] (CC) at (5,0) {
+  \textbf{CartController}
+  \nodepart{two}
+  \nodepart{three}
+  +index(): Response\\
+  +store(req:Request): Response\\
+  +destroy(id:int): Response
+};
+
+\node[ctrlbox] (CHC) at (10,0) {
+  \textbf{CheckoutController}
+  \nodepart{two}
+  \nodepart{three}
+  +index(): Response\\
+  +store(req:Request): Response\\
+  +success(o:Order): Response
+};
+
+\node[ctrlbox] (RC) at (15,0) {
+  \textbf{ReviewController}
+  \nodepart{two}
+  \nodepart{three}
+  +store(req,p:Product): Response\\
+  +destroy(r:Review): Response
+};
+
+\node[ctrlbox] (DC) at (20,0) {
+  \textbf{DashboardController}
+  \nodepart{two}
+  \nodepart{three}
+  +index(): Response
+};
+
+%% Admin Controllers (second row)
+\node[ctrlbox] (ADB) at (0,-5.5) {
+  \textbf{Admin$\backslash$DashboardController}
+  \nodepart{two}
+  \nodepart{three}
+  +index(): Response
+};
+
+\node[ctrlbox] (APC) at (5,-5.5) {
+  \textbf{Admin$\backslash$ProductController}
+  \nodepart{two}
+  \nodepart{three}
+  +index(): Response\\
+  +create(): Response\\
+  +store(req): Response\\
+  +edit(p): Response\\
+  +update(req,p): Response\\
+  +destroy(p): Response
+};
+
+\node[ctrlbox] (AOC) at (10,-5.5) {
+  \textbf{Admin$\backslash$OrderController}
+  \nodepart{two}
+  \nodepart{three}
+  +index(): Response
+};
+
+\node[ctrlbox] (ACC) at (15,-5.5) {
+  \textbf{Admin$\backslash$CustomerController}
+  \nodepart{two}
+  \nodepart{three}
+  +index(): Response
+};
+
+\node[ctrlbox] (AVC) at (20,-5.5) {
+  \textbf{Admin$\backslash$VendorController}
+  \nodepart{two}
+  \nodepart{three}
+  +index(): Response
+};
+
+%% ---- MODELS (bottom section) ----
+\node[modelbox] (User) at (0,-13) {
+  \textbf{User}
+  \nodepart{two}
+  -name: String\\
+  -email: String\\
+  -password: String\\
+  -role: String\\
+  -google\_id: String\\
+  -avatar: String
+  \nodepart{three}
+  +orders(): HasMany\\
+  +reviews(): HasMany\\
+  +activities(): HasMany\\
+  +isAdmin(): bool
+};
+
+\node[modelbox] (Product) at (5,-13) {
+  \textbf{Product}
+  \nodepart{two}
+  -name: String\\
+  -price: Decimal\\
+  -stock: int\\
+  -is\_active: bool\\
+  -is\_featured: bool
+  \nodepart{three}
+  +category(): BelongsTo\\
+  +reviews(): HasMany\\
+  +orderItems(): HasMany
+};
+
+\node[modelbox] (Category) at (10,-13) {
+  \textbf{Category}
+  \nodepart{two}
+  -name: String\\
+  -slug: String\\
+  -parent\_id: int\\
+  -is\_active: bool
+  \nodepart{three}
+  +products(): HasMany\\
+  +parent(): BelongsTo\\
+  +children(): HasMany
+};
+
+\node[modelbox] (Order) at (15,-13) {
+  \textbf{Order}
+  \nodepart{two}
+  -status: String\\
+  -total\_price: Decimal\\
+  -payment\_status: String\\
+  -payment\_method: String
+  \nodepart{three}
+  +user(): BelongsTo\\
+  +orderItems(): HasMany
+};
+
+\node[modelbox] (OrderItem) at (20,-13) {
+  \textbf{OrderItem}
+  \nodepart{two}
+  -product\_name: String\\
+  -quantity: int\\
+  -price: Decimal\\
+  -total: Decimal
+  \nodepart{three}
+  +order(): BelongsTo\\
+  +product(): BelongsTo
+};
+
+\node[modelbox] (Review) at (25,-13) {
+  \textbf{Review}
+  \nodepart{two}
+  -rating: int\\
+  -comment: String
+  \nodepart{three}
+  +user(): BelongsTo\\
+  +product(): BelongsTo
+};
+
+\node[modelbox] (Activity) at (30,-13) {
+  \textbf{Activity}
+  \nodepart{two}
+  -description: String\\
+  -subject\_type: String\\
+  -causer\_id: int\\
+  -properties: JSON
+  \nodepart{three}
+  +subject(): MorphTo\\
+  +causer(): MorphTo
+};
+
+%% ---- DEPENDENCY arrows (dashed) from controllers to models ----
+\draw[dep] (SC) -- (Product);
+\draw[dep] (SC) -- (Category);
+\draw[dep] (CC) -- (Product);
+\draw[dep] (CHC) -- (Order);
+\draw[dep] (CHC) -- (OrderItem);
+\draw[dep] (RC) -- (Review);
+\draw[dep] (DC) -- (User);
+\draw[dep] (APC) -- (Product);
+\draw[dep] (AOC) -- (Order);
+\draw[dep] (ACC) -- (User);
+
+%% ---- MODEL ASSOCIATIONS (solid lines with multiplicity) ----
+% User 1 --- 0..* Order (composition)
+\draw[assoc] (User.east) -- node[above,font=\scriptsize]{1} node[below,font=\scriptsize,pos=0.8]{0..*} (Order.west);
+% Order 1 --- 1..* OrderItem (composition, filled diamond at Order)
+\draw[assoc] (Order.east) -- node[above,font=\scriptsize]{1} node[below,font=\scriptsize,pos=0.8]{1..*} (OrderItem.west);
+% Product 1 --- 1..* OrderItem (aggregation)
+\draw[assoc] (Product.south) -- ++(0,-0.8) -| node[pos=0.1,right,font=\scriptsize]{1} node[pos=0.9,above,font=\scriptsize]{N} (OrderItem.north);
+% Product BelongsTo Category (association)
+\draw[assoc] (Product.north) -- ++(0,0.5) -- ++(-5,0) -- (Category.north) node[pos=0.5,above,font=\scriptsize]{N:1};
+% User 1 --- 0..* Review (aggregation)
+\draw[assoc] (User.south) -- ++(0,-0.5) -| node[pos=0.1,right,font=\scriptsize]{1} node[pos=0.9,above,font=\scriptsize]{N} (Review.north);
+% Product 1 --- 0..* Review
+\draw[assoc] (Product.south) -- ++(0,-1.5) -| node[pos=0.1,right,font=\scriptsize]{1} node[pos=0.9,above,font=\scriptsize]{N} (Review.north);
+
+\end{tikzpicture}
+}%
+\caption{UML Class Diagram of Francs Platform (MVC Architecture)}
+\label{fig:class_diagram}
 \end{figure}
 
 \subsection{Interface Screenshots}
