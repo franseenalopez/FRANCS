@@ -55,7 +55,7 @@ class ShopController extends Controller
 
     public function show(Product $product)
     {
-        $product->load('category');
+        $product->load(['category', 'reviews.user']);
         $relatedProducts = Product::where('category_id', $product->category_id)
             ->where('id', '!=', $product->id)
             ->take(4)

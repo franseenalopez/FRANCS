@@ -1,0 +1,87 @@
+\chapter{DEPLOYMENT}
+
+\section{Project Folder Structure}
+The Francs project follows the standard Laravel application directory structure with React components organised under \texttt{resources/js}:
+
+\begin{itemize}
+    \item \textbf{app/} -- PHP application logic:
+        \begin{itemize}
+            \item \texttt{Http/Controllers/} -- Application request handlers.
+            \item \texttt{Models/} -- Eloquent ORM database entities.
+            \item \texttt{Mail/} -- Email notification classes (e.g., \texttt{OrderPlaced}).
+            \item \texttt{Providers/} -- Service registration logic.
+        \end{itemize}
+    \item \textbf{resources/js/} -- React frontend:
+        \begin{itemize}
+            \item \texttt{Pages/} -- Full-page React components (Home, Shop, Admin).
+            \item \texttt{Components/} -- Shared UI elements (CustomDropdown, CartItem).
+            \item \texttt{Layouts/} -- Shared page templates (Authenticated, Guest).
+        \end{itemize}
+    \item \textbf{resources/views/} -- Static Blade root (\texttt{app.blade.php}) and Email templates.
+    \item \textbf{routes/} -- Endpoint definitions (\texttt{web.php}, \texttt{auth.php}, \texttt{console.php}).
+    \item \textbf{database/} -- Migrations, Seeders, and SQLite data store.
+    \item \textbf{public/} -- Storage symlinks, entry point (\texttt{index.php}), and compiled assets.
+    \item \textbf{config/} -- Global configuration files (app, database, mail, inertia).
+    \item \textbf{storage/} -- Private log files, session files, and uploaded product images.
+    \item \textbf{vite.config.js} -- Build pipeline configuration for Laravel and React.
+    \item \textbf{package.json} -- Frontend dependencies (React, GSAP, Tailwind, Inertia).
+    \item \textbf{composer.json} -- Backend dependencies (Laravel, Socialite, Breeze).
+\end{itemize}
+
+\section{Local Development Setup}
+To run the Francs application locally, the following commands are executed:
+
+\begin{lstlisting}[style=phpstyle]
+# Install PHP dependencies
+composer install
+
+# Install Node.js dependencies
+npm install
+
+# Set up environment
+cp .env.example .env
+php artisan key:generate
+
+# Run database migrations
+php artisan migrate
+
+# Start the Laravel development server
+php artisan serve
+
+# Start the Vite dev server (in a separate terminal)
+npm run dev
+\end{lstlisting}
+
+\section{Environment Configuration}
+Key \texttt{.env} variables required for the Francs application:
+
+\begin{lstlisting}[style=phpstyle]
+APP_NAME=Francs
+APP_URL=http://localhost
+
+DB_CONNECTION=sqlite
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_mailtrap_user
+MAIL_PASSWORD=your_mailtrap_pass
+MAIL_FROM_ADDRESS="hello@francs.com"
+MAIL_FROM_NAME="Francs"
+
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+\end{lstlisting}
+
+\section{Production Build}
+To generate optimized production assets:
+
+\begin{lstlisting}[style=phpstyle]
+npm run build
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+\end{lstlisting}
+
+The compiled assets are written to \texttt{public/build/} and referenced by the Blade root template. The application can be deployed to any standard PHP 8.2+ hosting environment (Apache/Nginx with PHP-FPM).

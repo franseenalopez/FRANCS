@@ -27,7 +27,7 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::orderBy('name')->get();
-        return view('admin.products.create', compact('categories'));
+        return Inertia::render('Admin/Products/Create', compact('categories'));
     }
 
     /**
@@ -49,12 +49,12 @@ class ProductController extends Controller
         $validated['slug'] = Str::slug($validated['name']);
         
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('products', 'public');
+            $path = $request->file('image')->store('products');
             $validated['image'] = $path;
         }
 
-        Product::create($validated);
-
+        $product = Product::create($validated);
+        
         return redirect()->route('admin.products.index')->with('success', 'Product created successfully.');
     }
 
@@ -98,9 +98,9 @@ class ProductController extends Controller
         if ($request->hasFile('image')) {
             // Delete old image
             if ($product->image) {
-                Storage::disk('public')->delete($product->image);
+                Storage::delete($product->image);
             }
-            $path = $request->file('image')->store('products', 'public');
+            $path = $request->file('image')->store('products');
             $validated['image'] = $path;
         }
 
@@ -115,7 +115,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         if ($product->image) {
-            Storage::disk('public')->delete($product->image);
+            Storage::delete($product->image);
         }
         $product->delete();
         return redirect()->route('admin.products.index')->with('success', 'Product deleted successfully.');

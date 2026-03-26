@@ -60,6 +60,19 @@ return [
             'report' => false,
         ],
 
+        'cloudinary' => [
+            'driver' => 'cloudinary',
+            'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+            'cloud' => env('CLOUDINARY_CLOUD_NAME'), // Duplicate to satisfy package quirk
+            'key' => env('CLOUDINARY_API_KEY'),
+            'secret' => env('CLOUDINARY_API_SECRET'),
+            'url' => env('CLOUDINARY_URL'),
+            'notification_url' => env('CLOUDINARY_NOTIFICATION_URL'),
+            'upload_preset' => env('CLOUDINARY_UPLOAD_PRESET'),
+            'folder' => env('CLOUDINARY_FOLDER', 'francs'),
+            'resource_type' => 'auto',
+        ],
+
     ],
 
     /*

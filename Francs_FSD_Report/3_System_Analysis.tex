@@ -1,0 +1,191 @@
+\chapter{SYSTEM ANALYSIS}
+
+\section{Module Description}
+The Francs e-commerce platform is divided into well-defined functional modules. Each module encapsulates a specific domain of the application:
+
+\begin{itemize}
+    \item \textbf{Authentication Module:} Handles user registration, login (email/password and Google OAuth), email verification, password reset, and session management. The module uses Laravel Breeze as the authentication scaffolding with additional Google OAuth via Socialite.
+
+    \item \textbf{Product Catalogue Module:} Manages the display of products from the database. It supports category-based filtering, keyword search, and sorting by price (ascending/descending) or by latest. Products are presented in a paginated grid on the Shop page and in detail on the Product Show page along with related products.
+
+    \item \textbf{Shopping Cart Module:} Implements a session-based cart system. Users can add products, adjust quantities, and remove items without requiring a database cart table. The cart persists across page navigations within the same browser session and is linked to the user's Laravel session.
+
+    \item \textbf{Checkout Module:} Guides users through a multi-step checkout process collecting shipping address, contact information, and payment method (Credit Card, PayPal, COD). On successful submission, an order and its associated order items are created in the database inside a DB transaction, the session cart is cleared, and an order confirmation email is dispatched.
+
+    \item \textbf{Order Management Module:} Stores and manages all customer orders. Each order includes shipping address (stored as JSON), payment method, payment status, and order status (pending, processing, shipped, completed, cancelled). Administrators can view and update orders through the admin dashboard.
+
+    \item \textbf{Review \& Rating Module:} Allows authenticated users to submit star ratings and text reviews for products they have purchased. Administrators or the review author can delete reviews. Reviews are displayed on the product detail page along with average rating indicators.
+
+    \item \textbf{Admin Dashboard Module:} Provides administrators with a centralized control panel. Features include managing products, categories, orders, customers, and vendors. It also displays an activity log that tracks stock updates and new user registrations via model event hooks.
+
+    \item \textbf{Email Notification Module:} Uses Laravel Mail to send order confirmation emails immediately after a successful checkout. The \texttt{OrderPlaced} Mailable class populates a Blade email template with order details (items, totals, shipping address) and dispatches via SMTP.
+
+    \item \textbf{Community Module:} A public-facing community/blog page that promotes brand engagement. It displays curated content and allows brand followers to interact with the community section of the site.
+
+    \item \textbf{Contact Module:} Provides a contact form page where users can reach the store team. It accepts user queries and is designed for future integration with a mail handler or CRM.
+\end{itemize}
+
+\section{Business Rules}
+
+Business rules define the constraints and logic governing the behaviour of the Francs platform.
+
+\textbf{Product \& Inventory Rules}
+\begin{itemize}
+    \item All products must belong to a category.
+    \item Each product has an \texttt{is\_active} flag; only active products are shown to customers.
+    \item Products with \texttt{is\_featured} set to true appear prominently on the landing page.
+    \item When a product's stock is updated by an admin, an activity log entry is automatically created.
+\end{itemize}
+
+\textbf{Cart \& Checkout Rules}
+\begin{itemize}
+    \item A user must be authenticated to access the checkout page.
+    \item An empty cart redirects users to the shop with an error message.
+    \item A 5\% tax is applied to the subtotal at checkout.
+    \item Supported payment methods are: Credit Card, PayPal, and Cash on Delivery (COD).
+    \item COD orders have a \texttt{payment\_status} of `unpaid'; all others default to `paid'.
+    \item On successful checkout, the session cart is cleared and an order confirmation email is sent.
+\end{itemize}
+
+\textbf{Order Management Rules}
+\begin{itemize}
+    \item An order record is created only within a successful database transaction; any failure triggers a rollback.
+    \item Email delivery failure does not cancel the order --- it is logged separately via \texttt{Log::error}.
+    \item Users can only view their own order confirmation page; admins can view all orders.
+\end{itemize}
+
+\textbf{Review Rules}
+\begin{itemize}
+    \item Only authenticated users can post reviews.
+    \item A review author or an admin can delete a review.
+\end{itemize}
+
+\textbf{Admin Rules}
+\begin{itemize}
+    \item Admin routes are protected by both the \texttt{auth} and \texttt{admin} middleware.
+    \item Admin CRUD operations on products and categories include image upload to cloud storage.
+\end{itemize}
+
+\newpage
+\section{Analysis of Architecture and Algorithms}
+
+{\large \textbf{Laravel MVC Architecture}}\\\\
+Francs follows the MVC (Model-View-Controller) pattern provided by the Laravel framework:
+\begin{enumerate}
+    \item \textbf{Model Layer:}
+    \begin{itemize}
+        \item Eloquent ORM models (\texttt{User}, \texttt{Product}, \texttt{Category}, \texttt{Order}, \texttt{OrderItem}, \texttt{Review}, \texttt{Activity}) represent database tables.
+        \item Relationships are defined using Eloquent methods (\texttt{belongsTo}, \texttt{hasMany}).
+        \item Model boot hooks automatically create activity log entries on stock changes and new user registrations.
+    \end{itemize}
+    \item \textbf{Controller Layer:}
+    \begin{itemize}
+        \item Controllers encapsulate business logic and data retrieval.
+        \item Inertia responses pass PHP data directly to React components as props.
+        \item Laravel Form Requests provide server-side input validation.
+    \end{itemize}
+    \item \textbf{View Layer (React + Inertia):}
+    \begin{itemize}
+        \item React components serve as the view layer, receiving controller-injected props.
+        \item Inertia's client-side router enables SPA-style navigation without full page reloads.
+        \item Tailwind CSS utility classes provide responsive, consistent styling.
+    \end{itemize}
+\end{enumerate}
+
+{\large \textbf{Session-Based Cart Algorithm}}\\\\
+The cart system uses PHP session storage:
+\begin{enumerate}
+    \item When a user adds a product, the \texttt{CartController::store} method retrieves the current session cart array.
+    \item If the product ID is already present, the quantity is incremented.
+    \item If new, the product is appended to the cart array.
+    \item The updated cart is written back to the session.
+    \item On checkout completion, \texttt{session()->forget('cart')} clears the cart.
+\end{enumerate}
+
+{\large \textbf{Checkout Transaction Algorithm}}\\\\
+To ensure data integrity during order creation:
+\begin{enumerate}
+    \item \texttt{DB::beginTransaction()} begins an atomic transaction.
+    \item An \texttt{Order} record is created with the validated shipping address (encoded as JSON) and payment details.
+    \item For each item in the session cart, an \texttt{OrderItem} record is created linked to the order.
+    \item \texttt{DB::commit()} saves all changes atomically on success.
+    \item On any exception, \texttt{DB::rollBack()} reverts all changes.
+\end{enumerate}
+
+\section{Project Pipeline}
+The Francs application follows the standard Laravel + React + Inertia development and request pipeline:
+
+\begin{enumerate}
+    \item User sends an HTTP request via the browser.
+    \item Laravel routes the request to the appropriate Controller method.
+    \item The Controller queries Models via Eloquent ORM.
+    \item The Controller returns an \texttt{Inertia::render()} response with data props.
+    \item Inertia.js on the client side updates the React component tree with the new props.
+    \item React renders the updated UI without a full page reload.
+    \item User interactions trigger new Inertia visits or form submissions.
+\end{enumerate}
+
+\section{Feasibility Analysis}
+
+\subsection{Technical Feasibility}
+The technologies chosen for Francs are mature, well-documented, and widely adopted in the industry. Laravel is one of the most popular PHP frameworks, with extensive community support. React is the dominant frontend library for building interactive UIs. Inertia.js is purpose-built for the Laravel + React combination, eliminating the need for a separate REST API layer. Vite provides near-instant HMR in development and optimized production builds. SQLite is used during development for zero-configuration setup, while the application is easily migrated to MySQL/PostgreSQL for production. The entire stack is open-source and free, making the project technically and financially feasible.
+
+\subsection{Economical Feasibility}
+Francs is developed entirely using free and open-source technology. Laravel, React, Tailwind CSS, and Vite incur no licensing costs. Email delivery can use free tiers of services like Mailtrap (for testing) or Gmail SMTP (for small-scale production). Cloud storage for product images uses Laravel's Storage facade which can be configured with local storage (free) or cloud providers like Cloudinary or S3 with free tiers. Hosting can be done on platforms such as Railway, Render, or a shared hosting provider at minimal cost.
+
+\subsection{Operational Feasibility}
+Francs is designed to be operationally straightforward. The admin dashboard provides a no-code interface for managing the entire store. Products, categories, orders, and customers can all be managed through CRUD interfaces. Email notifications are automated and triggered on order placement without manual intervention. The activity log keeps administrators informed of important system events. The MVC structure and modular codebase make future maintenance and feature additions manageable.
+
+\section{System Environment}
+
+\subsection{Software Environment}
+\textbf{Laravel 11 (PHP 8.2):} The backend framework providing routing, ORM, authentication, mail, and session management.\\\\
+\textbf{React 18 with Inertia.js 2.0:} The frontend layer providing component-based UI with SPA-style navigation using the Inertia protocol.\\\\
+\textbf{Tailwind CSS v3:} A utility-first CSS framework for responsive design.\\\\
+\textbf{Vite 7:} A fast build tool and dev server replacing traditional Webpack-based compilation.\\\\
+\textbf{GSAP 3:} GreenSock Animation Platform for smooth, performant animations on the landing page and about section.\\\\
+\textbf{Laravel Breeze:} Authentication scaffolding providing login, registration, password reset, and email verification pages.\\\\
+\textbf{Laravel Socialite:} Package for Google OAuth integration.\\\\
+\textbf{Laravel Mail:} Email delivery abstraction using SMTP for order confirmation notifications.\\\\
+\textbf{SQLite / MySQL:} Relational database for storing all application data.\\\\
+\textbf{React Hot Toast:} Notification library for in-app toast messages.\\\\
+\textbf{Composer:} PHP dependency manager.\\\\
+\textbf{NPM:} JavaScript package manager.
+
+\subsection{Hardware Environment}
+\textbf{Processor (CPU):} Intel Core i5 (8th Gen or above)\\\\
+\textbf{Memory (RAM):} 8 GB minimum (16 GB recommended)\\\\
+\textbf{Storage:} 256 GB SSD\\\\
+\textbf{Operating System:} Windows 10/11 or Ubuntu 22.04\\\\
+\textbf{Browser:} Google Chrome, Mozilla Firefox, or Microsoft Edge (latest)
+
+\newpage
+\section{Actors and Roles}
+
+The Francs system involves two primary actors:
+
+\noindent
+\textbf{Actor: Customer (Registered User)}\\\\
+\textbf{Role:}
+\begin{itemize}
+    \item Browse products by category, search, and sort.
+    \item View product details and related products.
+    \item Add products to the shopping cart and manage quantities.
+    \item Complete checkout by providing shipping and payment information.
+    \item Receive order confirmation emails automatically.
+    \item Submit and delete product reviews.
+    \item Manage personal profile information.
+    \item View personal order confirmation pages.
+\end{itemize}
+
+\noindent
+\textbf{Actor: Administrator}\\\\
+\textbf{Role:}
+\begin{itemize}
+    \item Access the admin dashboard with activity log and metrics.
+    \item Create, edit, and delete product listings including images.
+    \item Manage product categories.
+    \item View and manage all customer orders.
+    \item View registered customers and vendor listings.
+    \item Monitor activity logs for stock changes and user registrations.
+\end{itemize}

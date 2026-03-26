@@ -1,0 +1,749 @@
+\chapter{SYSTEM DESIGN}
+
+\section{Use Case Model}
+
+The Francs system has two primary actors: \textbf{Customer} and \textbf{Administrator}. The following diagram illustrates the interactions between the actors and the system use cases.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[node distance=1.5cm, every node/.style={fill=white, font=\small}, scale=0.8, every node/.style={scale=0.8}]
+        % Actors
+        \node (customer) [draw, circle, minimum size=0.5cm] {};
+        \draw (customer.south) -- ++(0,-0.5) -- ++(-0.3,-0.5) (customer.south) ++(0,-0.5) -- ++(0.3,-0.5);
+        \draw (customer.south) ++(0,-0.2) -- ++(-0.4,0) (customer.south) ++(0,-0.2) -- ++(0.4,0);
+        \node at (0, -1.8) {Customer};
+
+        \node (admin) [draw, circle, minimum size=0.5cm] at (12, 0) {};
+        \draw (admin.south) -- ++(0,-0.5) -- ++(-0.3,-0.5) (admin.south) ++(0,-0.5) -- ++(0.3,-0.5);
+        \draw (admin.south) ++(0,-0.2) -- ++(-0.4,0) (admin.south) ++(0,-0.2) -- ++(0.4,0);
+        \node at (12, -1.8) {Administrator};
+
+        % Boundary
+        \draw (2, 2.5) rectangle (10, -11);
+        \node at (6, 2.2) {\textbf{Francs System}};
+
+        % Use Cases
+        \node (u1) [draw, ellipse, minimum width=3cm] at (5, 1.5) {Register / Login};
+        \node (u2) [draw, ellipse, minimum width=3cm] at (5, 0) {Browse Products};
+        \node (u3) [draw, ellipse, minimum width=3cm] at (5, -1.5) {Manage Cart};
+        \node (u4) [draw, ellipse, minimum width=3cm] at (5, -3) {Checkout};
+        \node (u5) [draw, ellipse, minimum width=3cm] at (5, -4.5) {Review Products};
+        \node (u6) [draw, ellipse, minimum width=3cm] at (5, -6) {Manage Products};
+        \node (u7) [draw, ellipse, minimum width=3cm] at (5, -7.5) {Manage Categories};
+        \node (u8) [draw, ellipse, minimum width=3cm] at (5, -9) {View Orders};
+        \node (u9) [draw, ellipse, minimum width=3cm] at (5, -10.5) {View Activity Log};
+
+        % Connectors
+        \draw (0.5, -0.5) -- (u1);
+        \draw (0.5, -0.5) -- (u2);
+        \draw (0.5, -0.5) -- (u3);
+        \draw (0.5, -0.5) -- (u4);
+        \draw (0.5, -0.5) -- (u5);
+
+        \draw (11.5, -0.5) -- (u1);
+        \draw (11.5, -0.5) -- (u6);
+        \draw (11.5, -0.5) -- (u7);
+        \draw (11.5, -0.5) -- (u8);
+        \draw (11.5, -0.5) -- (u9);
+    \end{tikzpicture}
+    \caption{Use Case Diagram of Francs Platform}
+    \label{fig:use_case}
+\end{figure}
+
+\section{Activity Diagram}
+
+\subsection{Customer Shopping Flow}
+The customer shopping flow begins at the landing page. The customer browses products, selects items, adds them to the cart, and proceeds to checkout. During checkout, shipping and payment information is provided, the order is created, an email is sent, and the customer is redirected to the success page.
+
+\subsection{Order Checkout Sequence}
+The following sequence diagram provides a detailed view of the interactions between the Customer, the Application Logic, and the Database during a successful checkout operation.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[node distance=2cm, auto, >=stealth, scale=0.8, every node/.style={scale=0.8}]
+        % Participants
+        \node (cus) at (0, 0) {\textbf{Customer}};
+        \node (app) at (5, 0) {\textbf{App / CheckoutCtrl}};
+        \node (db) at (10, 0) {\textbf{Database}};
+
+        \draw[dashed] (cus) -- (0, -8);
+        \draw[dashed] (app) -- (5, -8);
+        \draw[dashed] (db) -- (10, -8);
+
+        % Messages
+        \draw[->] (0, -1) -- node {POST /checkout (form data)} (5, -1);
+        \draw[->] (5, -1.5) -- node {Validate Data} (5, -2);
+        \draw[->] (5, -2.5) -- node {BEGIN TRANSACTION} (10, -2.5);
+        \draw[->] (5, -3.5) -- node {INSERT INTO orders} (10, -3.5);
+        \draw[->] (10, -3.5) -- node[above] {Order ID} (5, -4);
+        \draw[->] (5, -4.5) -- node {INSERT INTO order\_items} (10, -4.5);
+        \draw[->] (5, -5.5) -- node {COMMIT TRANSACTION} (10, -5.5);
+        \draw[->] (5, -6.5) -- node {Send Confirmation Email} (5, -7);
+        \draw[->] (5, -7.5) -- node {Success Redirect} (0, -7.5);
+    \end{tikzpicture}
+    \caption{Order Checkout Sequence Diagram}
+    \label{fig:sequence_checkout}
+\end{figure}
+
+\subsection{Admin Product Management Flow}
+An administrator can create a product by filling in the product form (name, description, price, stock, category, images). The data is validated server-side, the image is uploaded to storage, and the product is saved. The admin can subsequently edit or soft-delete the product, with each stock change automatically creating an activity log entry via Eloquent model events.
+
+\section{Database Design}
+
+\subsection{Entity Relationship Description}
+The database consists of nine primary tables. The following Entity Relationship Diagram (ERD) illustrates the logical relationships between these entities, including foreign key constraints and cardinality.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[node distance=2.5cm, every node/.style={fill=white, font=\small, draw, rectangle, minimum width=2.5cm, minimum height=1cm}, scale=0.7, every node/.style={scale=0.7}]
+        % Entities
+        \node (user) {User};
+        \node (order) [right=of user] {Order};
+        \node (item) [right=of order] {OrderItem};
+        \node (prod) [below=of item] {Product};
+        \node (cat) [left=of prod] {Category};
+        \node (rev) [below=of user] {Review};
+        \node (act) [left=of user] {Activity};
+
+        % Relationships (simple lines with crows foot notation style text)
+        \draw (user) -- node[above, draw=none, fill=none] {1} node[above right, draw=none, fill=none, pos=0.9] {N} (order);
+        \draw (order) -- node[above, draw=none, fill=none] {1} node[above right, draw=none, fill=none, pos=0.9] {N} (item);
+        \draw (prod) -- node[right, draw=none, fill=none] {1} node[below right, draw=none, fill=none, pos=0.9] {N} (item);
+        \draw (cat) -- node[above, draw=none, fill=none] {1} node[above right, draw=none, fill=none, pos=0.9] {N} (prod);
+        \draw (user) -- node[left, draw=none, fill=none] {1} node[below left, draw=none, fill=none, pos=0.9] {N} (rev);
+        \draw (prod) -- node[above, draw=none, fill=none] {1} node[above left, draw=none, fill=none, pos=0.9] {N} (rev);
+        \draw (user) -- node[above, draw=none, fill=none] {1} node[above left, draw=none, fill=none, pos=0.9] {N} (act);
+    \end{tikzpicture}
+    \caption{Entity Relationship Diagram (ERD)}
+    \label{fig:erd}
+\end{figure}
+
+The primary tables are:
+\begin{itemize}
+    \item \textbf{users:} Stores customer and admin accounts.
+    \item \textbf{categories:} Stores product categories with names and slugs.
+    \item \textbf{products:} Stores product listings linked to a category.
+    \item \textbf{orders:} Stores customer orders linked to a user.
+    \item \textbf{order\_items:} Stores individual line items for each order.
+    \item \textbf{reviews:} Stores product reviews linked to a user and product.
+    \item \textbf{activities:} Stores activity log entries for auditing.
+    \item \textbf{sessions:} Stores system session data for persistence.
+    \item \textbf{password\_reset\_tokens:} Manages secure account recovery.
+\end{itemize}
+
+\subsection{Database Schema}
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{3cm}|p{3cm}|p{4cm}|p{3cm}|}
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{users Table} \label{tab:users} \\
+    \endlastfoot
+    id & bigint & Primary key & PK, AUTO\_INCREMENT \\
+    \hline
+    name & varchar(255) & Full name & NOT NULL \\
+    \hline
+    email & varchar(255) & Email address & UNIQUE, NOT NULL \\
+    \hline
+    password & varchar(255) & Hashed password & NULLABLE \\
+    \hline
+    role & varchar(50) & user / admin & DEFAULT 'user' \\
+    \hline
+    google\_id & varchar & Google OAuth ID & NULLABLE \\
+    \hline
+    avatar & varchar & Profile avatar URL & NULLABLE \\
+    \hline
+    email\_verified\_at & timestamp & Email verification & NULLABLE \\
+    \hline
+    created\_at & timestamp & Record creation time & \\
+    \hline
+    updated\_at & timestamp & Record update time & \\
+    \hline
+\end{longtable}
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{3cm}|p{3cm}|p{4cm}|p{3cm}|}
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{categories Table} \label{tab:categories} \\
+    \endlastfoot
+    id & bigint & Primary key & PK \\
+    \hline
+    name & varchar & Category name & NOT NULL \\
+    \hline
+    slug & varchar & URL-safe slug & UNIQUE \\
+    \hline
+    parent\_id & bigint & FK to categories & FK, NULLABLE \\
+    \hline
+    image & varchar & Image path & NULLABLE \\
+    \hline
+    description & text & Description & NULLABLE \\
+    \hline
+    is\_active & boolean & Active status & DEFAULT true \\
+    \hline
+    created\_at & timestamp & Record creation & \\
+    \hline
+    updated\_at & timestamp & Record update & \\
+    \hline
+\end{longtable}
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{3cm}|p{3cm}|p{4cm}|p{3cm}|}
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{products Table} \label{tab:products} \\
+    \endlastfoot
+    id & bigint & Primary key & PK \\
+    \hline
+    category\_id & bigint & FK to categories & FK \\
+    \hline
+    name & varchar & Product name & NOT NULL \\
+    \hline
+    slug & varchar & URL-safe identifier & UNIQUE \\
+    \hline
+    description & text & Product description & \\
+    \hline
+    price & decimal(8,2) & Product price & NOT NULL \\
+    \hline
+    stock & integer & Available stock & DEFAULT 0 \\
+    \hline
+    image & varchar & Primary image path & \\
+    \hline
+    images & json & Additional image paths & \\
+    \hline
+    is\_active & boolean & Visibility flag & DEFAULT true \\
+    \hline
+    is\_featured & boolean & Featured flag & DEFAULT false \\
+    \hline
+    created\_at & timestamp & Record creation time & \\
+    \hline
+    updated\_at & timestamp & Record update time & \\
+    \hline
+\end{longtable}
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{3cm}|p{3cm}|p{4cm}|p{3cm}|}
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{orders Table} \label{tab:orders} \\
+    \endlastfoot
+    id & bigint & Primary key & PK \\
+    \hline
+    user\_id & bigint & FK to users & FK, NULLABLE \\
+    \hline
+    status & varchar & Order status & DEFAULT 'pending' \\
+    \hline
+    total\_price & decimal(10,2) & Total incl. tax & NOT NULL \\
+    \hline
+    payment\_status & varchar & paid / unpaid & DEFAULT 'pending' \\
+    \hline
+    payment\_method & varchar & credit\_card / paypal / cod & NULLABLE \\
+    \hline
+    shipping\_address & text & JSON-encoded address & NOT NULL \\
+    \hline
+    billing\_address & text & JSON-encoded address & NULLABLE \\
+    \hline
+    notes & text & Additional notes & NULLABLE \\
+    \hline
+    created\_at & timestamp & Order date/time & \\
+    \hline
+    updated\_at & timestamp & Last update & \\
+    \hline
+\end{longtable}
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{3cm}|p{3cm}|p{4cm}|p{3cm}|}
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{order\_items Table} \label{tab:order_items} \\
+    \endlastfoot
+    id & bigint & Primary key & PK \\
+    \hline
+    order\_id & bigint & FK to orders & FK \\
+    \hline
+    product\_id & bigint & FK to products & FK \\
+    \hline
+    product\_name & varchar & Snapshot of product name & NOT NULL \\
+    \hline
+    quantity & integer & Quantity ordered & NOT NULL \\
+    \hline
+    price & decimal & Unit price at purchase & NOT NULL \\
+    \hline
+    total & decimal & quantity * price & NOT NULL \\
+    \hline
+    created\_at & timestamp & Record creation & \\
+    \hline
+    updated\_at & timestamp & Record update & \\
+    \hline
+\end{longtable}
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{3cm}|p{3cm}|p{4cm}|p{3cm}|}
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{reviews Table} \label{tab:reviews} \\
+    \endlastfoot
+    id & bigint & Primary key & PK \\
+    \hline
+    user\_id & bigint & FK to users & FK, NOT NULL \\
+    \hline
+    product\_id & bigint & FK to products & FK, NOT NULL \\
+    \hline
+    rating & tinyint & Review rating (1-5) & NOT NULL \\
+    \hline
+    comment & text & Review text & NULLABLE \\
+    \hline
+    created\_at & timestamp & Record creation & \\
+    \hline
+    updated\_at & timestamp & Record update & \\
+    \hline
+\end{longtable}
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{3cm}|p{3cm}|p{4cm}|p{3cm}|}
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{activities Table} \label{tab:activities} \\
+    \endlastfoot
+    id & bigint & Primary key & PK \\
+    \hline
+    description & varchar & Entry description & NOT NULL \\
+    \hline
+    subject\_type & varchar & Polymorphic type & NULLABLE \\
+    \hline
+    subject\_id & bigint & Polymorphic ID & NULLABLE \\
+    \hline
+    causer\_type & varchar & Polymorphic type & NULLABLE \\
+    \hline
+    causer\_id & bigint & Polymorphic ID & NULLABLE \\
+    \hline
+    properties & json & Extra properties & NULLABLE \\
+    \hline
+    created\_at & timestamp & Record creation & \\
+    \hline
+    updated\_at & timestamp & Record update & \\
+    \hline
+\end{longtable}
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{3cm}|p{3cm}|p{4cm}|p{3cm}|}
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{password\_reset\_tokens Table} \label{tab:password_reset} \\
+    \endlastfoot
+    email & varchar & Primary identifier & PK, UNIQUE \\
+    \hline
+    token & varchar & Reset token & NOT NULL \\
+    \hline
+    created\_at & timestamp & Creation time & NULLABLE \\
+    \hline
+\end{longtable}
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{3cm}|p{3cm}|p{4cm}|p{3cm}|}
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Column} & \textbf{Type} & \textbf{Description} & \textbf{Constraints} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{sessions Table} \label{tab:sessions} \\
+    \endlastfoot
+    id & varchar & Session ID & PK \\
+    \hline
+    user\_id & bigint & FK to users & NULLABLE \\
+    \hline
+    ip\_address & varchar(45) & IP of user & NULLABLE \\
+    \hline
+    user\_agent & text & Browser agent & NULLABLE \\
+    \hline
+    payload & longtext & Session data & NOT NULL \\
+    \hline
+    last\_activity & integer & Timestamp & NOT NULL \\
+    \hline
+\end{longtable}
+
+\section{System Design}
+
+\subsection{UI Design Overview}
+The Francs frontend is built with React components and Tailwind CSS. The UI consists of the following key screens:
+\begin{itemize}
+    \item \textbf{Welcome / Landing Page:} Animated hero section using GSAP, featured products, brand story, and call-to-action buttons.
+    \item \textbf{Shop Page:} Paginated product grid with sidebar filters for category and sort controls.
+    \item \textbf{Product Detail Page:} Large product image, description, price, add-to-cart button, related products, and review section.
+    \item \textbf{Cart Page:} List of cart items with quantity controls, totals, and checkout button.
+    \item \textbf{Checkout Page:} Multi-field form for shipping address, email, phone, and payment method selection.
+    \item \textbf{Order Success Page:} Confirmation display with order ID, items purchased, shipping address, and total.
+    \item \textbf{Dashboard Page:} User order history and profile summary.
+    \item \textbf{Admin Dashboard:} Stats panel with activity log, product management table, category management, and order list.
+    \item \textbf{About Page:} Brand story, team members, and value propositions with scroll animations.
+    \item \textbf{Community Page:} Brand community content and engagement features.
+\end{itemize}
+
+\subsection{Class Diagram}
+The following class diagram represents the core Model-Controller-View architecture of the Francs platform, illustrating the relationships between the Eloquent models and their corresponding controllers.
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[node distance=3cm, 
+        UML/.style={
+            draw, 
+            rectangle split, 
+            rectangle split parts=2, 
+            fill=white, 
+            font=\small, 
+            minimum width=3cm, 
+            align=left
+        }, 
+        scale=0.7, 
+        every node/.style={scale=0.7}]
+        
+        % Controllers
+        \node[UML] (sc) {ShopController \nodepart{second} +index() \\ +show()};
+        \node[UML] (cc) [right=of sc] {CartController \nodepart{second} +store() \\ +destroy()};
+        \node[UML] (chc) [right=of cc] {CheckoutController \nodepart{second} +index() \\ +store()};
+
+        % Models
+        \node[UML] (pm) [below=of sc] {Product \nodepart{second} -name \\ -price \\ -stock};
+        \node[UML] (om) [below=of chc] {Order \nodepart{second} -total\_price \\ -status \\ -address};
+        \node[UML] (um) [below=of pm] {User \nodepart{second} -name \\ -email \\ -role};
+
+        % Connections
+        \draw[->] (sc) -- (pm);
+        \draw[->] (cc) -- (pm);
+        \draw[->] (chc) -- (om);
+        \draw[dashed, ->] (om) -- (um);
+        \draw[dashed, ->] (pm) -- (um);
+    \end{tikzpicture}
+    \caption{Simplified Class Diagram of Francs Platform}
+    \label{fig:class_diagram}
+\end{figure}
+
+\subsection{Interface Screenshots}
+
+The following screenshots illustrate the actual user interface and functionality of the Francs e-commerce platform across various key sections.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Home.png}
+    \caption{Francs Home Page - Hero Section and Featured Products}
+    \label{fig:home_page}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{store.png}
+    \caption{Product Catalogue and Category Filtering}
+    \label{fig:shop_page}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{About.png}
+    \caption{About Us Page - Brand Story and Values}
+    \label{fig:about_page}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Contact.png}
+    \caption{Contact Page - Customer Support and Inquiry Form}
+    \label{fig:contact_page}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Cart.png}
+    \caption{Shopping Cart Interface - Item Management}
+    \label{fig:cart_page}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Checkout.png}
+    \caption{Secure Checkout Process - Shipping and Payment}
+    \label{fig:checkout_page}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Dashboard.png}
+    \caption{Customer Dashboard - Order History and Profile}
+    \label{fig:customer_dashboard}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{community.png}
+    \caption{Francs Community Section - Customer Engagement}
+    \label{fig:community_page}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Admin.png}
+    \caption{Administrator Dashboard - Overview and Statistics}
+    \label{fig:admin_dashboard}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Admin_products.png}
+    \caption{Admin Panel - Product Inventory Management}
+    \label{fig:admin_products}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Admin_orders.png}
+    \caption{Admin Panel - Order Fulfillment and Tracking}
+    \label{fig:admin_orders}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Admin_customers.png}
+    \caption{Admin Panel - Customer Database and Management}
+    \label{fig:admin_customers}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{Admin_vendors.png}
+    \caption{Admin Panel - Vendor Management and Oversight}
+    \label{fig:admin_vendors}
+\end{figure}
+
+\subsection{Routing Structure}
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{4cm}|p{2cm}|p{4cm}|p{3cm}|}
+    \hline
+    \textbf{Route URI} & \textbf{Method} & \textbf{Controller} & \textbf{Auth Required} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Route URI} & \textbf{Method} & \textbf{Controller} & \textbf{Auth Required} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{Francs Application Routes} \label{tab:routes} \\
+    \endlastfoot
+    / & GET & Welcome (Inertia) & No \\
+    \hline
+    /about & GET & About (Inertia) & No \\
+    \hline
+    /shop & GET & ShopController@index & No \\
+    \hline
+    /shop/\{product\} & GET & ShopController@show & No \\
+    \hline
+    /cart & GET & CartController@index & No \\
+    \hline
+    /cart & POST & CartController@store & No \\
+    \hline
+    /cart/\{id\} & DELETE & CartController@destroy & No \\
+    \hline
+    /checkout & GET & CheckoutController@index & Yes \\
+    \hline
+    /checkout & POST & CheckoutController@store & Yes \\
+    \hline
+    /checkout/success/\{order\} & GET & CheckoutController@success & Yes \\
+    \hline
+    /shop/\{product\}/reviews & POST & ReviewController@store & Yes \\
+    \hline
+    /reviews/\{review\} & DELETE & ReviewController@destroy & Yes \\
+    \hline
+    /community & GET & CommunityController@index & No \\
+    \hline
+    /dashboard & GET & DashboardController@index & Yes \\
+    \hline
+    /profile & GET/PATCH/DELETE & ProfileController & Yes \\
+    \hline
+    /admin/dashboard & GET & Admin\textbackslash DashboardController & Admin \\
+    \hline
+    /admin/products & CRUD & Admin\textbackslash ProductController & Admin \\
+    \hline
+    /admin/categories & CRUD & Admin\textbackslash CategoryController & Admin \\
+    \hline
+    /admin/orders & GET & Admin\textbackslash OrderController & Admin \\
+    \hline
+    /admin/customers & GET & Admin\textbackslash CustomerController & Admin \\
+    \hline
+\end{longtable}
+
+\subsection{Key Code: Checkout Order Processing}
+The following PHP code demonstrates the core order creation logic in \texttt{CheckoutController::store()}:
+
+\begin{lstlisting}[style=phpstyle]
+DB::beginTransaction();
+
+$order = Order::create([
+    'user_id'          => auth()->id(),
+    'status'           => 'pending',
+    'total_price'      => $totalPrice,
+    'payment_status'   => $validated['paymentMethod'] === 'cod' 
+                            ? 'unpaid' : 'paid',
+    'payment_method'   => $validated['paymentMethod'],
+    'shipping_address' => json_encode([
+        'first_name'  => $validated['firstName'],
+        'last_name'   => $validated['lastName'],
+        'address'     => $validated['address'],
+        'city'        => $validated['city'],
+        'country'     => $validated['country'],
+        'postal_code' => $validated['postalCode'],
+        'phone'       => $validated['phone'] ?? null,
+    ]),
+]);
+
+foreach ($cart as $id => $item) {
+    OrderItem::create([
+        'order_id'     => $order->id,
+        'product_id'   => $id,
+        'product_name' => $item['name'],
+        'quantity'     => $item['quantity'],
+        'price'        => $item['price'],
+        'total'        => $item['price'] * $item['quantity'],
+    ]);
+}
+
+DB::commit();
+session()->forget('cart');
+Mail::to($validated['email'])->send(new OrderPlaced($order));
+\end{lstlisting}
+
+\subsection{Key Code: Product Model with Activity Logging}
+\begin{lstlisting}[style=phpstyle]
+static::updated(function ($product) {
+    if ($product->wasChanged('stock')) {
+        Activity::create([
+            'description' => 'Product stock updated',
+            'subject_type' => get_class($product),
+            'subject_id'   => $product->id,
+            'causer_type'  => auth()->check() 
+                               ? get_class(auth()->user()) : null,
+            'causer_id'    => auth()->id(),
+            'properties'   => json_encode([
+                'name'      => $product->name,
+                'old_stock' => $product->getOriginal('stock'),
+                'new_stock' => $product->stock
+            ]),
+        ]);
+    }
+});
+\end{lstlisting}
+
+\subsection{Key Code: Shop Search and Filter}
+\begin{lstlisting}[style=phpstyle]
+$query = Product::with('category');
+
+if ($request->filled('category')) {
+    $query->whereHas('category', function ($q) use ($request) {
+        $q->where('slug', $request->category);
+    });
+}
+
+if ($request->filled('search')) {
+    $searchTerm = strtolower($request->search);
+    $query->where(function ($q) use ($searchTerm) {
+        $q->whereRaw('LOWER(name) LIKE ?', ['%'.$searchTerm.'%'])
+          ->orWhereRaw('LOWER(description) LIKE ?', 
+                       ['%'.$searchTerm.'%']);
+    });
+}
+
+$products = $query->paginate(12)->withQueryString();
+\end{lstlisting}
+
+\subsection{Source Code Screenshots}
+The technical implementation of the Francs platform is documented through the following source code screenshots, highlighting the backend and frontend architecture.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{code_laravel.png}
+    \caption{Laravel Backend Implementation - Checkout Controller}
+    \label{fig:code_laravel}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{code_react.png}
+    \caption{React.js Frontend Implementation - Shop Page Component}
+    \label{fig:code_react}
+\end{figure}

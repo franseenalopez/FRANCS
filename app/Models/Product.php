@@ -71,4 +71,30 @@ class Product extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
+    protected $appends = ['image_url'];
+
+    public function getImageUrlAttribute()
+    {
+        if (!$this->image) {
+            return null;
+        }
+        
+        // If it's already a complete URL, return it
+        if (str_starts_with($this->image, 'http')) {
+            return $this->image;
+        }
+
+        try {
+            return \Illuminate\Support\Facades\Storage::url($this->image);
+        } catch (\Throwable $e) {
+            // Log the error if needed: \Illuminate\Support\Facades\Log::error("Cloudinary image missing: " . $this->image);
+            return null; // Or return a default placeholder image URL
+        }
+    }
 }

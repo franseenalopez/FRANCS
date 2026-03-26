@@ -43,11 +43,18 @@ class CategoryController extends Controller
         $validated['slug'] = Str::slug($validated['name']);
         
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('categories', 'public');
+            $path = $request->file('image')->store('categories');
             $validated['image'] = $path;
         }
 
-        Category::create($validated);
+        $category = Category::create($validated);
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'message' => 'Category created successfully.',
+                'category' => $category
+            ]);
+        }
 
         return redirect()->route('admin.categories.index')->with('success', 'Category created successfully.');
     }
@@ -87,7 +94,7 @@ class CategoryController extends Controller
         }
 
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('categories', 'public');
+            $path = $request->file('image')->store('categories');
             $validated['image'] = $path;
         }
 
@@ -102,6 +109,13 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         $category->delete();
+
+        if (request()->wantsJson()) {
+            return response()->json([
+                'message' => 'Category deleted successfully.'
+            ]);
+        }
+
         return redirect()->route('admin.categories.index')->with('success', 'Category deleted successfully.');
     }
 }

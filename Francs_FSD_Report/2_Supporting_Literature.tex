@@ -1,0 +1,22 @@
+\chapter{SUPPORTING LITERATURE}
+
+\section{Laravel Framework}
+Laravel is a PHP web application framework with expressive, elegant syntax. It follows the Model-View-Controller (MVC) pattern and provides tools for routing, authentication, sessions, caching, and more. Laravel's Eloquent ORM provides an active-record style implementation for working with databases, making it easy to define model relationships and run database queries.
+
+\section{React.js and Inertia.js}
+React is a JavaScript library for building user interfaces through a component-based architecture. Inertia.js bridges the gap between a traditional server-side Laravel application and a single-page application (SPA) feel using React. Inertia removes the need for a separate REST API by returning Inertia page responses directly from Laravel controllers, enabling client-side navigation without full page reloads.
+
+\section{Tailwind CSS}
+Tailwind CSS is a utility-first CSS framework that allows developers to build custom designs rapidly by composing utility classes directly in markup. It promotes consistent design tokens (spacing, colors, typography) and generates minimal CSS by purging unused styles in production.
+
+\section{Vite}
+Vite is a next-generation build tool that offers lightning-fast hot module replacement (HMR) during development and produces optimized production bundles using Rollup. Laravel ships with first-party Vite integration via the \texttt{laravel-vite-plugin}.
+
+\section{GSAP (GreenSock Animation Platform)}
+GSAP is a professional-grade JavaScript animation library used in Francs for smooth page transitions, scroll animations, and micro-interactions on the landing and about pages. It is significantly more performant than CSS animations for complex, sequenced animations.
+
+\section{Google OAuth}
+OAuth 2.0 is an authorization framework that allows third-party applications to obtain limited access to user accounts. Francs integrates Google OAuth to allow users to log in with their Google account, reducing friction in the sign-up process and improving user conversion.
+
+\section{Laravel Mail and SMTP}
+Laravel provides a clean email API built on top of the popular Symfony Mailer. Mail classes (Mailables) define the email content and data, while SMTP\\ drivers connect to mail servers (e.g., Mailtrap for testing, Gmail SMTP for production) to deliver emails reliably.

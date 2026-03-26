@@ -1,0 +1,136 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{times}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{lipsum}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{tabularx}
+\geometry{margin=1in}
+\usepackage{setspace}
+\usepackage[backend=biber,style=numeric]{biblatex}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows, positioning, shapes.multipart, shadows, calc}
+\addbibresource{references.bib}
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+\graphicspath{{images/}}
+
+% Code listing style for PHP/JavaScript
+\lstdefinestyle{phpstyle}{
+  language=PHP,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  tabsize=2,
+  showspaces=false,
+  showstringspaces=false,
+  breaklines=true,
+  numbers=none
+}
+
+\lstdefinestyle{jsstyle}{
+  language=JavaScript,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{orange},
+  tabsize=2,
+  showspaces=false,
+  showstringspaces=false,
+  breaklines=true,
+  numbers=none
+}
+
+\lstdefinestyle{sqlstyle}{
+  language=SQL,
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue!80!black},
+  commentstyle=\color{gray},
+  stringstyle=\color{teal},
+  tabsize=2,
+  showspaces=false,
+  showstringspaces=false,
+  breaklines=true,
+  numbers=none
+}
+
+\titleformat{\chapter}
+  {\vspace{-2cm} \centering\bfseries\LARGE}
+  {\thechapter}{1em}{}
+
+\begin{document}
+
+\include{coverpage}
+\newpage
+\include{certificate}
+\newpage
+\setstretch{1.15}
+\pagenumbering{roman}
+\include{acknowledgement}
+\newpage
+\include{abstract}
+\newpage
+
+\renewcommand{\baselinestretch}{1.15}
+\selectfont
+
+\addcontentsline{toc}{chapter}{LIST OF TABLES}
+\renewcommand{\listtablename}{\hfill \LARGE \textbf{LIST OF TABLES} \hfill}
+\listoftables
+\newpage
+
+\addcontentsline{toc}{chapter}{LIST OF FIGURES}
+\renewcommand{\listfigurename}{\hfill \LARGE \textbf{LIST OF FIGURES} \hfill}
+\listoffigures
+\newpage
+
+\renewcommand{\contentsname}{\hfill \LARGE \textbf{CONTENTS} \hfill}
+\tableofcontents
+
+\newpage
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{{Francs -- E-Commerce Platform}}
+
+\renewcommand{\footrulewidth}{0.4pt}
+\fancyfoot[L]{Department of Computer Applications, RCSS}
+\fancyfoot[R]{\thepage}
+
+\fancypagestyle{plain}{%
+  \fancyhf{}
+  \fancyhead[R]{{Francs -- E-Commerce Platform}}
+  \renewcommand{\footrulewidth}{0.4pt}
+  \fancyfoot[L]{Department of Computer Science, RCSS}
+  \fancyfoot[R]{\thepage}
+}
+
+\fancypagestyle{noheaderfooter}{
+    \fancyhf{}
+    \renewcommand{\headrulewidth}{0pt}
+    \renewcommand{\footrulewidth}{0pt}
+}
+\pagenumbering{arabic}
+
+\include{1_Introduction}
+\include{2_Supporting_Literature}
+\include{3_System_Analysis}
+\include{4_System_Design}
+\include{5_testing}
+\include{6_deployment}
+\include{7_Git_History}
+\include{8_Conclusion}
+\include{9_Future_works}
+\include{10_Appendix}
+
+\renewcommand{\bibname}{11 REFERENCES}
+\addcontentsline{toc}{chapter}{11 REFERENCES}
+
+\end{document}

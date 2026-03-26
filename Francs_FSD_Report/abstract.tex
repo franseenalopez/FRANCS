@@ -1,0 +1,14 @@
+\chapter*{ \begin{center}
+    \textbf{\LARGE ABSTRACT}
+\end{center} }
+\addcontentsline{toc}{chapter}{ABSTRACT}
+\vspace{-2cm}
+
+\noindent
+\textbf{Francs} is a full-stack e-commerce web application built to provide a seamless online shopping experience for fashion and lifestyle products. The platform is designed to serve both customers and administrators, offering a rich set of features including product browsing, shopping cart management, secure checkout with email confirmation, product reviews, and a comprehensive admin dashboard.
+\\\\
+The application is developed using \textbf{Laravel} as the backend framework, \textbf{React.js} with \textbf{Inertia.js} as the frontend layer, and \textbf{Tailwind CSS} for responsive styling. The system supports both traditional email/password authentication and \textbf{Google OAuth} social login. Products are organized by categories, and administrators can manage inventory, orders, customers, and vendors through a dedicated admin panel.
+\\\\
+The checkout flow validates shipping information, calculates totals with tax, stores orders and order items in the database, and automatically dispatches \textbf{order confirmation emails} via Laravel Mail (SMTP). A session-based cart system provides persistent cart management without requiring a dedicated cart table.
+\\\\
+The project follows a clean MVC architecture, employs Eloquent ORM for database operations, uses Vite for asset bundling, and tracks admin activities through a built-in activity logging system. This report documents the complete system analysis, design, testing, and deployment of the Francs e-commerce platform.

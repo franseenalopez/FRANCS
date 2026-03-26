@@ -1,0 +1,209 @@
+\chapter{TESTING}
+
+Testing is an essential phase of software development that ensures the Francs e-commerce platform works reliably, handles edge cases gracefully, and provides a seamless user experience. The testing strategy covers Unit Testing, Integration Testing, System Testing, Regression Testing, and Performance Testing.
+
+\section{Unit Testing}
+Unit testing checks individual components of the system --- controllers, model logic, and validation rules --- in isolation.
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{1.5cm}|p{2.5cm}|p{4cm}|p{4cm}|c|}
+    \hline
+    \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{Unit Test Cases for Francs} \label{tab:unit_tests} \\
+    \endlastfoot
+    UT01 & CartController & \raggedright Add a product to an empty session cart & \raggedright Product appears in cart with correct quantity & Pass \\
+    \hline
+    UT02 & CartController & \raggedright Add duplicate product increments quantity & \raggedright Quantity is updated not duplicated & Pass \\
+    \hline
+    UT03 & CartController & \raggedright Remove a product from cart & \raggedright Product is no longer in session cart & Pass \\
+    \hline
+    UT04 & CheckoutController & \raggedright Redirect if cart is empty on GET /checkout & \raggedright Redirects to shop with error message & Pass \\
+    \hline
+    UT05 & CheckoutController & \raggedright Validate required checkout fields & \raggedright Validation errors returned for missing fields & Pass \\
+    \hline
+    UT06 & CheckoutController & \raggedright Order is created with correct totals & \raggedright total\_price equals subtotal + 5\% tax & Pass \\
+    \hline
+    UT07 & Product Model & \raggedright Stock update triggers activity log & \raggedright Activity record created on stock change & Pass \\
+    \hline
+    UT08 & User Model & \raggedright New user creation triggers activity log & \raggedright Activity record created with user's name and email & Pass \\
+    \hline
+    UT09 & ShopController & \raggedright Search returns matching products & \raggedright Products matching search term are returned & Pass \\
+    \hline
+    UT10 & ShopController & \raggedright Category filter shows correct products & \raggedright Only products from selected category shown & Pass \\
+    \hline
+    UT11 & ReviewController & \raggedright Authenticated user can submit review & \raggedright Review saved and visible on product page & Pass \\
+    \hline
+    UT12 & Auth & \raggedright User isAdmin() returns false for regular user & \raggedright Role check returns false & Pass \\
+    \hline
+\end{longtable}
+
+\newpage
+\section{Integration Testing}
+Integration testing ensures that the different components of Francs work together correctly as an end-to-end flow.
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{1.5cm}|p{3cm}|p{3.5cm}|p{3.5cm}|c|}
+    \hline
+    \textbf{Test ID} & \textbf{Components} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Test ID} & \textbf{Components} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{Integration Test Cases for Francs} \label{tab:integration_tests} \\
+    \endlastfoot
+    IT01 & Cart + Checkout & \raggedright Items added to cart appear on checkout page & \raggedright Cart items shown correctly & Pass \\
+    \hline
+    IT02 & Checkout + Database & \raggedright Order and OrderItems saved after checkout & \raggedright Records exist in DB after successful checkout & Pass \\
+    \hline
+    IT03 & Checkout + Mail & \raggedright Order confirmation email dispatched on checkout & \raggedright Email is sent to provided address & Pass \\
+    \hline
+    IT04 & Checkout + Session & \raggedright Cart is cleared after successful order & \raggedright Session cart is empty post-checkout & Pass \\
+    \hline
+    IT05 & Auth + Admin Middleware & \raggedright Non-admin user cannot access /admin routes & \raggedright 403 or redirect returned & Pass \\
+    \hline
+    IT06 & Product + Activity Log & \raggedright Admin edits stock; activity log updated & \raggedright New activity log entry visible in admin & Pass \\
+    \hline
+    IT07 & Shop + Product & \raggedright Pagination loads 12 products per page & \raggedright 12 products shown; next page available & Pass \\
+    \hline
+    IT08 & Review + Product & \raggedright Review submitted shows on product detail page & \raggedright Review visible with author name and rating & Pass \\
+    \hline
+\end{longtable}
+
+\newpage
+\section{System Testing}
+System testing evaluates the Francs platform as a complete, end-to-end system, verifying functionality, navigation, and API integration.
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{1.5cm}|p{2.5cm}|p{4cm}|p{3.5cm}|c|}
+    \hline
+    \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{System Test Cases for Francs} \label{tab:system_tests} \\
+    \endlastfoot
+    ST01 & Application Launch & \raggedright Website loads without errors on fresh browser & \raggedright Landing page renders correctly & Pass \\
+    \hline
+    ST02 & Navigation & \raggedright All navbar links navigate to correct pages & \raggedright Shop, About, Community, Contact pages load & Pass \\
+    \hline
+    ST03 & Authentication & \raggedright User can register, login, and logout & \raggedright Session created and destroyed properly & Pass \\
+    \hline
+    ST04 & Google OAuth & \raggedright User can sign in via Google & \raggedright Redirected to dashboard post-login & Pass \\
+    \hline
+    ST05 & End-to-End Purchase & \raggedright Add item to cart, checkout, receive email & \raggedright Order created, email received & Pass \\
+    \hline
+    ST06 & Admin Management & \raggedright Admin can create, edit, delete products & \raggedright Product CRUD works without errors & Pass \\
+    \hline
+    ST07 & Responsive Design & \raggedright Application renders correctly on mobile & \raggedright Layout adapts without overflow issues & Pass \\
+    \hline
+\end{longtable}
+
+\newpage
+\section{Regression Testing}
+Regression testing ensures that new features or bug fixes do not break existing functionality.
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{1.5cm}|p{2.5cm}|p{4cm}|p{3.5cm}|c|}
+    \hline
+    \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{Regression Test Cases for Francs} \label{tab:regression_tests} \\
+    \endlastfoot
+    RT01 & Cart Logic & \raggedright Adding email notification did not break cart flow & \raggedright Cart add/remove still works as expected & Pass \\
+    \hline
+    RT02 & Auth Flow & \raggedright Google OAuth addition did not break email login & \raggedright Both auth methods work simultaneously & Pass \\
+    \hline
+    RT03 & Admin Routes & \raggedright New admin features do not affect public routes & \raggedright Public shop pages load normally & Pass \\
+    \hline
+    RT04 & Review System & \raggedright Review addition did not break product detail page & \raggedright Product page loads with reviews section & Pass \\
+    \hline
+    RT05 & Mail Module & \raggedright Mail failure does not cancel order & \raggedright Order saved even if mail throws exception & Pass \\
+    \hline
+\end{longtable}
+
+\newpage
+\section{Performance Testing}
+Performance testing ensures the Francs platform handles typical load conditions efficiently.
+
+\renewcommand{\arraystretch}{1.3}
+\begin{longtable}{|p{1.5cm}|p{2.5cm}|p{4cm}|p{3.5cm}|c|}
+    \hline
+    \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \hline
+    \endfirsthead
+    \hline
+    \textbf{Test ID} & \textbf{Component} & \textbf{Test Description} & \textbf{Expected Result} & \textbf{Status} \\
+    \hline
+    \endhead
+    \hline
+    \endfoot
+    \hline
+    \caption{Performance Test Cases for Francs} \label{tab:performance_tests} \\
+    \endlastfoot
+    PT01 & Page Load & \raggedright Measure home page initial load time & \raggedright Under 2 seconds on local network & Pass \\
+    \hline
+    PT02 & Database Queries & \raggedright Shop page with 100+ products & \raggedright Paginated query completes under 300ms & Pass \\
+    \hline
+    PT03 & Checkout Submit & \raggedright Measure checkout form submission response & \raggedright Response within 1-2 seconds & Pass \\
+    \hline
+    PT04 & Asset Build & \raggedright Vite production build bundle size & \raggedright JS bundle under 500KB gzipped & Pass \\
+    \hline
+    PT05 & Memory Usage & \raggedright Laravel memory during checkout DB transaction & \raggedright Within acceptable PHP memory limit & Pass \\
+    \hline
+\end{longtable}
+\section{Live Project Verification (Development Evidence)}
+The following live verification was performed on the active Francs project environment to ensure full end-to-end functionality.
+
+\subsection{Project Statistics Snapshot}
+\begin{itemize}
+    \item \textbf{Registered Users:} 4 (including 'Franseena Lopez', 'Admin User')
+    \item \textbf{Total Products:} 21 items in database
+    \item \textbf{Total Orders:} 7 orders successfully processed
+    \item \textbf{Live Server:} http://localhost:8000 (Status: Active)
+\end{itemize}
+
+\subsection{Manual Verification Log}
+A manual checkout simulation was performed using a custom Tinker script to verify the atomic database transaction and order creation logic.
+
+\begin{lstlisting}[style=phpstyle]
+# Verification Command: php artisan tinker verify_project.php
+# Output:
+SUCCESS: Order created for Franseena Lopez | Order ID: 7 | Total: 303.72
+\end{lstlisting}
+
+This test confirms that the User-Product-Order relationship is fully functional and the database constraints (foreign keys, total price calculation) are being enforced correctly within the Laravel/PostgreSQL backend.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{live_test_evidence.png}
+    \caption{Live Manual Verification Result (Order \#7 Created)}
+    \label{fig:live_test_evidence}
+\end{figure}
