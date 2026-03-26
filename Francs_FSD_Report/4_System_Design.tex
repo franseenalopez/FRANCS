@@ -6,46 +6,7 @@ The Francs system has two primary actors: \textbf{Customer} and \textbf{Administ
 
 \begin{figure}[H]
     \centering
-    \begin{tikzpicture}[node distance=1.5cm, every node/.style={fill=white, font=\small}, scale=0.8, every node/.style={scale=0.8}]
-        % Actors
-        \node (customer) [draw, circle, minimum size=0.5cm] {};
-        \draw (customer.south) -- ++(0,-0.5) -- ++(-0.3,-0.5) (customer.south) ++(0,-0.5) -- ++(0.3,-0.5);
-        \draw (customer.south) ++(0,-0.2) -- ++(-0.4,0) (customer.south) ++(0,-0.2) -- ++(0.4,0);
-        \node at (0, -1.8) {Customer};
-
-        \node (admin) [draw, circle, minimum size=0.5cm] at (12, 0) {};
-        \draw (admin.south) -- ++(0,-0.5) -- ++(-0.3,-0.5) (admin.south) ++(0,-0.5) -- ++(0.3,-0.5);
-        \draw (admin.south) ++(0,-0.2) -- ++(-0.4,0) (admin.south) ++(0,-0.2) -- ++(0.4,0);
-        \node at (12, -1.8) {Administrator};
-
-        % Boundary
-        \draw (2, 2.5) rectangle (10, -11);
-        \node at (6, 2.2) {\textbf{Francs System}};
-
-        % Use Cases
-        \node (u1) [draw, ellipse, minimum width=3cm] at (5, 1.5) {Register / Login};
-        \node (u2) [draw, ellipse, minimum width=3cm] at (5, 0) {Browse Products};
-        \node (u3) [draw, ellipse, minimum width=3cm] at (5, -1.5) {Manage Cart};
-        \node (u4) [draw, ellipse, minimum width=3cm] at (5, -3) {Checkout};
-        \node (u5) [draw, ellipse, minimum width=3cm] at (5, -4.5) {Review Products};
-        \node (u6) [draw, ellipse, minimum width=3cm] at (5, -6) {Manage Products};
-        \node (u7) [draw, ellipse, minimum width=3cm] at (5, -7.5) {Manage Categories};
-        \node (u8) [draw, ellipse, minimum width=3cm] at (5, -9) {View Orders};
-        \node (u9) [draw, ellipse, minimum width=3cm] at (5, -10.5) {View Activity Log};
-
-        % Connectors
-        \draw (0.5, -0.5) -- (u1);
-        \draw (0.5, -0.5) -- (u2);
-        \draw (0.5, -0.5) -- (u3);
-        \draw (0.5, -0.5) -- (u4);
-        \draw (0.5, -0.5) -- (u5);
-
-        \draw (11.5, -0.5) -- (u1);
-        \draw (11.5, -0.5) -- (u6);
-        \draw (11.5, -0.5) -- (u7);
-        \draw (11.5, -0.5) -- (u8);
-        \draw (11.5, -0.5) -- (u9);
-    \end{tikzpicture}
+    \includegraphics[width=1\textwidth]{use_case_diagram.png}
     \caption{Use Case Diagram of Francs Platform}
     \label{fig:use_case}
 \end{figure}
@@ -60,27 +21,7 @@ The following sequence diagram provides a detailed view of the interactions betw
 
 \begin{figure}[H]
     \centering
-    \begin{tikzpicture}[node distance=2cm, auto, >=stealth, scale=0.8, every node/.style={scale=0.8}]
-        % Participants
-        \node (cus) at (0, 0) {\textbf{Customer}};
-        \node (app) at (5, 0) {\textbf{App / CheckoutCtrl}};
-        \node (db) at (10, 0) {\textbf{Database}};
-
-        \draw[dashed] (cus) -- (0, -8);
-        \draw[dashed] (app) -- (5, -8);
-        \draw[dashed] (db) -- (10, -8);
-
-        % Messages
-        \draw[->] (0, -1) -- node {POST /checkout (form data)} (5, -1);
-        \draw[->] (5, -1.5) -- node {Validate Data} (5, -2);
-        \draw[->] (5, -2.5) -- node {BEGIN TRANSACTION} (10, -2.5);
-        \draw[->] (5, -3.5) -- node {INSERT INTO orders} (10, -3.5);
-        \draw[->] (10, -3.5) -- node[above] {Order ID} (5, -4);
-        \draw[->] (5, -4.5) -- node {INSERT INTO order\_items} (10, -4.5);
-        \draw[->] (5, -5.5) -- node {COMMIT TRANSACTION} (10, -5.5);
-        \draw[->] (5, -6.5) -- node {Send Confirmation Email} (5, -7);
-        \draw[->] (5, -7.5) -- node {Success Redirect} (0, -7.5);
-    \end{tikzpicture}
+    \includegraphics[width=1\textwidth]{sequence_diagram.png}
     \caption{Order Checkout Sequence Diagram}
     \label{fig:sequence_checkout}
 \end{figure}
@@ -95,26 +36,8 @@ The database consists of nine primary tables. The following Entity Relationship 
 
 \begin{figure}[H]
     \centering
-    \begin{tikzpicture}[node distance=2.5cm, every node/.style={fill=white, font=\small, draw, rectangle, minimum width=2.5cm, minimum height=1cm}, scale=0.7, every node/.style={scale=0.7}]
-        % Entities
-        \node (user) {User};
-        \node (order) [right=of user] {Order};
-        \node (item) [right=of order] {OrderItem};
-        \node (prod) [below=of item] {Product};
-        \node (cat) [left=of prod] {Category};
-        \node (rev) [below=of user] {Review};
-        \node (act) [left=of user] {Activity};
-
-        % Relationships (simple lines with crows foot notation style text)
-        \draw (user) -- node[above, draw=none, fill=none] {1} node[above right, draw=none, fill=none, pos=0.9] {N} (order);
-        \draw (order) -- node[above, draw=none, fill=none] {1} node[above right, draw=none, fill=none, pos=0.9] {N} (item);
-        \draw (prod) -- node[right, draw=none, fill=none] {1} node[below right, draw=none, fill=none, pos=0.9] {N} (item);
-        \draw (cat) -- node[above, draw=none, fill=none] {1} node[above right, draw=none, fill=none, pos=0.9] {N} (prod);
-        \draw (user) -- node[left, draw=none, fill=none] {1} node[below left, draw=none, fill=none, pos=0.9] {N} (rev);
-        \draw (prod) -- node[above, draw=none, fill=none] {1} node[above left, draw=none, fill=none, pos=0.9] {N} (rev);
-        \draw (user) -- node[above, draw=none, fill=none] {1} node[above left, draw=none, fill=none, pos=0.9] {N} (act);
-    \end{tikzpicture}
-    \caption{Entity Relationship Diagram (ERD)}
+    \includegraphics[width=1\textwidth]{erd_diagram.png}
+    \caption{Entity Relationship Diagram (ERD) -- Francs PostgreSQL Database}
     \label{fig:erd}
 \end{figure}
 
@@ -463,37 +386,8 @@ The following class diagram represents the core Model-Controller-View architectu
 
 \begin{figure}[H]
     \centering
-    \begin{tikzpicture}[node distance=3cm, 
-        UML/.style={
-            draw, 
-            rectangle split, 
-            rectangle split parts=2, 
-            fill=white, 
-            font=\small, 
-            minimum width=3cm, 
-            align=left
-        }, 
-        scale=0.7, 
-        every node/.style={scale=0.7}]
-        
-        % Controllers
-        \node[UML] (sc) {ShopController \nodepart{second} +index() \\ +show()};
-        \node[UML] (cc) [right=of sc] {CartController \nodepart{second} +store() \\ +destroy()};
-        \node[UML] (chc) [right=of cc] {CheckoutController \nodepart{second} +index() \\ +store()};
-
-        % Models
-        \node[UML] (pm) [below=of sc] {Product \nodepart{second} -name \\ -price \\ -stock};
-        \node[UML] (om) [below=of chc] {Order \nodepart{second} -total\_price \\ -status \\ -address};
-        \node[UML] (um) [below=of pm] {User \nodepart{second} -name \\ -email \\ -role};
-
-        % Connections
-        \draw[->] (sc) -- (pm);
-        \draw[->] (cc) -- (pm);
-        \draw[->] (chc) -- (om);
-        \draw[dashed, ->] (om) -- (um);
-        \draw[dashed, ->] (pm) -- (um);
-    \end{tikzpicture}
-    \caption{Simplified Class Diagram of Francs Platform}
+    \includegraphics[width=1\textwidth]{class_diagram.png}
+    \caption{MVC Class Diagram of Francs Platform}
     \label{fig:class_diagram}
 \end{figure}
 
