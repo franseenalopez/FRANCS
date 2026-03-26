@@ -128,10 +128,10 @@ The Francs application follows the standard Laravel + React + Inertia developmen
 \section{Feasibility Analysis}
 
 \subsection{Technical Feasibility}
-The technologies chosen for Francs are mature, well-documented, and widely adopted in the industry. Laravel is one of the most popular PHP frameworks, with extensive community support. React is the dominant frontend library for building interactive UIs. Inertia.js is purpose-built for the Laravel + React combination, eliminating the need for a separate REST API layer. Vite provides near-instant HMR in development and optimized production builds. SQLite is used during development for zero-configuration setup, while the application is easily migrated to MySQL/PostgreSQL for production. The entire stack is open-source and free, making the project technically and financially feasible.
+The technologies chosen for Francs are mature, well-documented, and widely adopted in the industry. Laravel is one of the most popular PHP frameworks, with extensive community support. React is the dominant frontend library for building interactive UIs. Inertia.js is purpose-built for the Laravel + React combination, eliminating the need for a separate REST API layer. Vite 7 provides near-instant HMR in development and optimized production builds. PostgreSQL is used as the relational database engine, offering robust JSON support and performance for production workloads. The entire stack is open-source and free, making the project technically and financially feasible.
 
 \subsection{Economical Feasibility}
-Francs is developed entirely using free and open-source technology. Laravel, React, Tailwind CSS, and Vite incur no licensing costs. Email delivery can use free tiers of services like Mailtrap (for testing) or Gmail SMTP (for small-scale production). Cloud storage for product images uses Laravel's Storage facade which can be configured with local storage (free) or cloud providers like Cloudinary or S3 with free tiers. Hosting can be done on platforms such as Railway, Render, or a shared hosting provider at minimal cost.
+Francs is developed entirely using free and open-source technology. Laravel, React, Tailwind CSS, and Vite incur no licensing costs. Email delivery uses Gmail SMTP which is available at no cost for standard usage. Cloud storage for product images uses Cloudinary via the \texttt{cloudinary-laravel} package, which provides a generous free tier. Hosting can be done on platforms such as Railway or Render at minimal cost.
 
 \subsection{Operational Feasibility}
 Francs is designed to be operationally straightforward. The admin dashboard provides a no-code interface for managing the entire store. Products, categories, orders, and customers can all be managed through CRUD interfaces. Email notifications are automated and triggered on order placement without manual intervention. The activity log keeps administrators informed of important system events. The MVC structure and modular codebase make future maintenance and feature additions manageable.
@@ -139,15 +139,16 @@ Francs is designed to be operationally straightforward. The admin dashboard prov
 \section{System Environment}
 
 \subsection{Software Environment}
-\textbf{Laravel 11 (PHP 8.2):} The backend framework providing routing, ORM, authentication, mail, and session management.\\\\
+\textbf{Laravel 12 (PHP 8.2):} The backend framework providing routing, ORM, authentication, mail, and session management.\\\\
 \textbf{React 18 with Inertia.js 2.0:} The frontend layer providing component-based UI with SPA-style navigation using the Inertia protocol.\\\\
 \textbf{Tailwind CSS v3:} A utility-first CSS framework for responsive design.\\\\
 \textbf{Vite 7:} A fast build tool and dev server replacing traditional Webpack-based compilation.\\\\
 \textbf{GSAP 3:} GreenSock Animation Platform for smooth, performant animations on the landing page and about section.\\\\
 \textbf{Laravel Breeze:} Authentication scaffolding providing login, registration, password reset, and email verification pages.\\\\
 \textbf{Laravel Socialite:} Package for Google OAuth integration.\\\\
-\textbf{Laravel Mail:} Email delivery abstraction using SMTP for order confirmation notifications.\\\\
-\textbf{SQLite / MySQL:} Relational database for storing all application data.\\\\
+\textbf{Laravel Mail:} Email delivery abstraction using SMTP (Gmail) for order confirmation notifications.\\\\
+\textbf{Cloudinary:} Cloud-based image storage platform for product and category images via the \texttt{cloudinary-laravel} package.\\\\
+\textbf{PostgreSQL:} Relational database for storing all application data.\\\\
 \textbf{React Hot Toast:} Notification library for in-app toast messages.\\\\
 \textbf{Composer:} PHP dependency manager.\\\\
 \textbf{NPM:} JavaScript package manager.

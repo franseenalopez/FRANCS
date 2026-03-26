@@ -19,7 +19,7 @@ The Francs project follows the standard Laravel application directory structure 
         \end{itemize}
     \item \textbf{resources/views/} -- Static Blade root (\texttt{app.blade.php}) and Email templates.
     \item \textbf{routes/} -- Endpoint definitions (\texttt{web.php}, \texttt{auth.php}, \texttt{console.php}).
-    \item \textbf{database/} -- Migrations, Seeders, and SQLite data store.
+    \item \textbf{database/} -- Migrations, Seeders, and factory definitions.
     \item \textbf{public/} -- Storage symlinks, entry point (\texttt{index.php}), and compiled assets.
     \item \textbf{config/} -- Global configuration files (app, database, mail, inertia).
     \item \textbf{storage/} -- Private log files, session files, and uploaded product images.
@@ -56,22 +56,33 @@ npm run dev
 Key \texttt{.env} variables required for the Francs application:
 
 \begin{lstlisting}[style=phpstyle]
-APP_NAME=Francs
+APP_NAME=FRANCS
 APP_URL=http://localhost
 
-DB_CONNECTION=sqlite
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=your_database_name
+DB_USERNAME=postgres
+DB_PASSWORD=your_db_password
 
 MAIL_MAILER=smtp
-MAIL_HOST=smtp.mailtrap.io
-MAIL_PORT=2525
-MAIL_USERNAME=your_mailtrap_user
-MAIL_PASSWORD=your_mailtrap_pass
-MAIL_FROM_ADDRESS="hello@francs.com"
-MAIL_FROM_NAME="Francs"
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your_gmail_address
+MAIL_PASSWORD=your_gmail_app_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="your_gmail_address"
+MAIL_FROM_NAME="${APP_NAME}"
 
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
 GOOGLE_REDIRECT_URI=http://localhost:8000/auth/google/callback
+
+CLOUDINARY_API_KEY=your_cloudinary_api_key
+CLOUDINARY_API_SECRET=your_cloudinary_api_secret
+CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
+CLOUDINARY_URL=cloudinary://api_key:api_secret@cloud_name
 \end{lstlisting}
 
 \section{Production Build}

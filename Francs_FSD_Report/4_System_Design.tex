@@ -153,15 +153,17 @@ The primary tables are:
     \hline
     email & varchar(255) & Email address & UNIQUE, NOT NULL \\
     \hline
-    password & varchar(255) & Hashed password & NULLABLE \\
+    password & varchar(255) & Hashed password & NOT NULL \\
     \hline
-    role & varchar(50) & user / admin & DEFAULT 'user' \\
+    role & varchar(50) & customer / admin & DEFAULT 'customer' \\
     \hline
     google\_id & varchar & Google OAuth ID & NULLABLE \\
     \hline
     avatar & varchar & Profile avatar URL & NULLABLE \\
     \hline
     email\_verified\_at & timestamp & Email verification & NULLABLE \\
+    \hline
+    remember\_token & varchar(100) & Session remember token & NULLABLE \\
     \hline
     created\_at & timestamp & Record creation time & \\
     \hline
@@ -229,7 +231,7 @@ The primary tables are:
     \hline
     description & text & Product description & \\
     \hline
-    price & decimal(8,2) & Product price & NOT NULL \\
+    price & decimal(10,2) & Product price & NOT NULL \\
     \hline
     stock & integer & Available stock & DEFAULT 0 \\
     \hline
@@ -645,6 +647,10 @@ The following screenshots illustrate the actual user interface and functionality
     /admin/orders & GET & Admin\textbackslash OrderController & Admin \\
     \hline
     /admin/customers & GET & Admin\textbackslash CustomerController & Admin \\
+    \hline
+    /admin/vendors & GET & Admin\textbackslash VendorController & Admin \\
+    \hline
+    /contact & GET & ContactController@index & No \\
     \hline
 \end{longtable}
 
